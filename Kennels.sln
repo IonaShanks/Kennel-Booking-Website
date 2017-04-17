@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kennels", "Kennels\Kennels.csproj", "{8646DB5C-1C30-46C6-A418-F5BEED0CF932}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kennels.Tests", "Kennels.Tests\Kennels.Tests.csproj", "{837F1A81-FF60-4F21-A8FA-201A617A30B9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8646DB5C-1C30-46C6-A418-F5BEED0CF932}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8646DB5C-1C30-46C6-A418-F5BEED0CF932}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8646DB5C-1C30-46C6-A418-F5BEED0CF932}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8646DB5C-1C30-46C6-A418-F5BEED0CF932}.Release|Any CPU.Build.0 = Release|Any CPU
+		{837F1A81-FF60-4F21-A8FA-201A617A30B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{837F1A81-FF60-4F21-A8FA-201A617A30B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{837F1A81-FF60-4F21-A8FA-201A617A30B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{837F1A81-FF60-4F21-A8FA-201A617A30B9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
