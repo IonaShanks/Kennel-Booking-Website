@@ -1,0 +1,58 @@
+﻿@model IEnumerable<Kennels.Models.Rating>
+@using Kennels.Controllers;
+
+@{
+    ViewBag.Title = "KennelRatings";
+}
+
+<h2>Ratings</h2>
+<h3 style="color:red;">@ViewBag.NoRate </h3>
+@if (RatingsController.Customer == true)
+{
+    <p>
+        @Html.ActionLink("My Ratings", "Index")
+    </p>    
+}
+@if (Request.IsAuthenticated != true)                   
+{
+    <p>
+        @Html.ActionLink("Rate a Kennel", "Create")
+    </p>
+}
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Kennel.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Ratings)
+        </th>
+        <th class="col-md-3">
+            @Html.DisplayNameFor(model => model.Comment)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.RatingDate)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Kennel.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Ratings)
+        </td>
+        <td class="maxwidth">
+            @Html.DisplayFor(modelItem => item.Comment)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.RatingDate)
+        </td>   
+        <td>@Html.ActionLink("Details", "Details", new { id = item.RatingID })</td>     
+    </tr>
+}
+
+</table>

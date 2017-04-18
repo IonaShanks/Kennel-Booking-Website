@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Data.Entity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -75,6 +75,41 @@ namespace Kennels.Controllers
             return View(model);
         }
 
+        public ActionResult Edit(string id, ManageMessageId? message = null)
+        {
+            var Db = new KennelsContext();
+
+            var userId = User.Identity.GetUserId();
+            var user = Db.Users.SingleOrDefault(u => u.Email == userId);
+            var model = new EditUserViewModel(user);
+            return View(model);
+
+
+        }
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(EditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var Db = new KennelsContext();
+                var user = Db.Users.SingleOrDefault(u => u.Email == model.Email);
+                // Update the user data:
+                user.Fname = model.Fname;
+                user.Lname = model.Lname;
+                user.Address = model.Address;
+                user.County = model.County;
+                user.PhoneNumber = model.PhoneNumber;
+
+                Db.Entry(user).State = EntityState.Modified;
+                await Db.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
         //
         // POST: /Manage/RemoveLogin
         [HttpPost]
@@ -98,6 +133,8 @@ namespace Kennels.Controllers
             }
             return RedirectToAction("ManageLogins", new { Message = message });
         }
+
+        
 
         //
         // GET: /Manage/AddPhoneNumber
@@ -212,6 +249,9 @@ namespace Kennels.Controllers
             }
             return RedirectToAction("Index", new { Message = ManageMessageId.RemovePhoneSuccess });
         }
+
+        
+
 
         //
         // GET: /Manage/ChangePassword

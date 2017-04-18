@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Security.Claims;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -151,7 +148,7 @@ namespace Kennels.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, UserType = model.UserType, Fname = model.Fname, Lname = model.Lname, Address = model.Address, County = model.County, PhoneNumber = model.PhoneNumber };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -171,6 +168,9 @@ namespace Kennels.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
+
+        
+
 
         //
         // GET: /Account/ConfirmEmail

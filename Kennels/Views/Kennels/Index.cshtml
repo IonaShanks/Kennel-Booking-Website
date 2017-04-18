@@ -1,0 +1,137 @@
+﻿@model IEnumerable<Kennels.Models.Kennel>
+@using Kennels.Controllers;
+
+<a name="top"></a>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+
+
+<p>
+   @if (KennelsController.KennelOwner == true)
+   {@Html.ActionLink("My Kennels", "MyKennels"); }
+</p>
+
+
+
+@using (Html.BeginForm("Index", "Kennels", FormMethod.Get))
+
+{
+    <div class="row">
+               
+            <div class="col-md-12">
+
+                <div class="form-group, col-md-4">
+                    <label class="control-label" for="inputDefault">County:</label>
+                    @Html.DropDownList("county", (SelectList)ViewBag.county, "All", new { @class = "form-control" })
+                </div>
+
+                <div class="form-group, col-md-4">
+                    <label class="control-label" for="inputDefault">Name: </label>
+                    @Html.TextBox("searchName", "", new { @class = "form-control" })
+                </div>
+
+                <div class="form-group, col-md-4">
+                    <label class="control-label" for="inputDefault">Minimum Rating:</label>
+                    @Html.DropDownList("searchRate", (SelectList)ViewBag.rate, "All", new { @class = "form-control" })
+                </div>                
+            
+                <div class="form-group, col-md-4">
+                    <br />
+                    <label class="control-label" for="inputDefault">Start Date: </label>
+                    @Html.TextBox("searchStart", "", new { type = "date", @class = "form-control" })
+                </div>
+
+                <div class="form-group, col-md-4">
+                    <br />
+                    <label class="control-label" for="inputDefault">End Date: </label>
+                    @Html.TextBox("searchEnd", "", new { type = "date", @class = "form-control" })
+                </div>
+
+                <div class="form-group, col-md-4">
+                    <br /> 
+                    <label class="control-label" for="inputDefault">Sort By:</label>
+                    @Html.DropDownList("sort", (SelectList)ViewBag.sort, "All", new { @class = "form-control" })
+                </div>
+
+                <div class="form-group, col-md-4">
+                    <br />
+                    
+                    <button class="btn btn-default" type="submit">Filter</button>
+                </div>
+            </div>
+        </div>   
+   
+
+    <hr />
+
+}
+@foreach (var item in Model)
+{
+    <div class="col-md-6">
+
+        <h3>@Html.ActionLink(item.Name, "Details", new { id = item.KennelID })</h3>
+
+
+        <dl class="dl-horizontal">
+
+            <dt>
+                @Html.DisplayNameFor(model => model.County)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => item.County)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.PricePerNight)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => item.PricePerNight)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.PricePerWeek)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => item.PricePerWeek)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.LgeDog)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => item.LgeDog)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.MedDog)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => item.MedDog)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.SmlDog)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => item.SmlDog)
+            </dd>
+
+
+        </dl>
+    </div>
+    }
+@*<p style="color: white;"> hi </p>*@
+<div style="clear: both;">
+    <a href="#top">Back to top</a>
+</div>

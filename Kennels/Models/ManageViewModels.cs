@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
+using Kennels.Models;
 
 namespace Kennels.Models
 {
@@ -23,6 +24,45 @@ namespace Kennels.Models
     public class FactorViewModel
     {
         public string Purpose { get; set; }
+    }
+
+    
+
+
+
+    public class EditUserViewModel
+    {
+        public EditUserViewModel() { }
+
+        // Allow Initialization with an instance of ApplicationUser:
+        public EditUserViewModel(ApplicationUser user)
+        {
+            
+            //this.Email = user.Email;
+            this.Fname = user.Fname;
+            this.Lname = user.Lname;
+            this.Address = user.Address;
+            this.County = user.County;
+            this.PhoneNumber = user.PhoneNumber;
+        }
+
+        [Required, Display(Name = "First Name")]
+        public string Fname { get; set; }
+
+        [Required, Display(Name = "Last Name")]
+        public string Lname { get; set; }
+
+        [Required]
+        public string Address { get; set; }
+
+        [Required]
+        public County County { get; set; }
+
+        [Required, Phone, Display(Name = "Phone Number")]
+        public string PhoneNumber { get; set; }
+
+        [Required, EmailAddress, Display(Name = "Email")]
+        public string Email { get; set; }
     }
 
     public class SetPasswordViewModel
@@ -57,6 +97,23 @@ namespace Kennels.Models
         [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
     }
+
+    //To edit the user details
+    //public class EditUserDetailsViewModel
+    //{
+    //    [Key, Required, Display(Name = "First Name")]
+    //    public string Fname { get; set; }
+
+    //    [Required, Display(Name = "Last Name")]
+    //    public string Lname { get; set; }
+
+    //    [Required]
+    //    public string Address { get; set; }
+
+    //    [Required]
+    //    public County County { get; set; }
+    //}
+
 
     public class AddPhoneNumberViewModel
     {

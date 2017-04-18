@@ -1,0 +1,51 @@
+﻿@model Kennels.Models.Booking
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Booking details for:</h2>
+
+<div>
+    <h4>@Html.DisplayFor(model => model.Kennel.Name)</h4>
+    <hr />
+    <dl class="dl-horizontal">
+      
+        <dt>
+            @Html.DisplayNameFor(model => model.StartDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StartDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EndDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EndDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TotalNights)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TotalNights)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Cancel Booking", "Delete", new { id = Model.BookingID }) |
+    @Html.ActionLink("Back to Bookings", "Index")
+</p>

@@ -1,0 +1,136 @@
+﻿@model Kennels.Models.Kennel
+@using Kennels.Controllers;
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>@Html.DisplayFor(model => model.Name)</h2>
+
+<h4>
+    @if (KennelsController.KennelOwner == false)
+    {
+
+        @Html.ActionLink("Book This Kennel", "Create", "Bookings", new { id = Model.KennelID }, null)
+    }
+    @if (KennelsController.KennelOwner == true)
+    {        
+            @Html.ActionLink("Edit Kennel", "Edit", "Kennels", new { id = Model.KennelID }, null)        
+    }
+</h4>
+
+
+<div>
+    <h4></h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            Customer Rating :
+        </dt>
+        <dd>
+            @ViewBag.avgRating  @Html.ActionLink(" See all ratings", "KennelRatings", "Ratings", new { id = Model.KennelID }, null)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Address) : 
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.County) : 
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.County)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PhoneNumber) : 
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PhoneNumber)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email) : 
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Capacity) : 
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Capacity)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PricePerNight) : 
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PricePerNight)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PricePerWeek) : 
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PricePerWeek)
+        </dd>
+
+        <dt>
+            Cancellation Period : 
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CancellationPeriod) (Hours)
+        </dd>
+
+        <dt>
+            Type of dogs : 
+        </dt>
+        <dd>
+            <div class="row">
+                <div class="col-md-1">
+                    @Html.DisplayNameFor(model => model.LgeDog)
+                    @Html.DisplayFor(model => model.LgeDog)
+                </div>
+
+                <div class="col-md-1">
+                    @Html.DisplayNameFor(model => model.MedDog)
+                    @Html.DisplayFor(model => model.MedDog)
+                </div>
+
+                <div class="col-md-1">
+                    @Html.DisplayNameFor(model => model.SmlDog)
+                    @Html.DisplayFor(model => model.SmlDog)
+                </div>
+            </div>
+        </dd>
+
+    
+
+    </dl>
+</div>
+
+<p>
+    @if (KennelsController.KennelOwner == false)
+    {
+        @Html.ActionLink("Back to All Kennels", "Index")
+    }
+    @if (KennelsController.KennelOwner == true)
+    {        
+            @Html.ActionLink("Back to My Kennels", "MyKennels")        
+    }
+
+</p>
+

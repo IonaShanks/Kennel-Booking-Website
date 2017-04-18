@@ -1,0 +1,49 @@
+﻿@model Kennels.Models.Rating
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Rating</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Kennel.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Kennel.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Ratings)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Ratings)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Comment)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Comment)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RatingDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RatingDate)
+        </dd>
+
+    </dl>
+</div>
+<p>    
+    @Html.ActionLink("Back to Kennel Ratings", "KennelRatings", "Ratings", new { id = Model.KennelID }, null)
+</p>
