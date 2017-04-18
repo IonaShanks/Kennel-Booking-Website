@@ -127,11 +127,21 @@
                 @Html.DisplayFor(model => item.SmlDog)
             </dd>
 
+            @* Calculates an estimate of price *@
+            @if (KennelsController.dateSearch == true)
+            {
+            <dt style="color:green;"><h4>Estimated Price</h4></dt>
+            <dd>@{const int week = 7;
+                int estNights = (KennelsController.searchEn - KennelsController.searchSt).Days;
+                double estPrice = ((estNights % week) * item.PricePerNight) + ((estNights / week) * item.PricePerWeek);}
+                <h4>€@estPrice</h4>
+            </dd>
+            }
 
         </dl>
     </div>
     }
-@*<p style="color: white;"> hi </p>*@
+
 <div style="clear: both;">
     <a href="#top">Back to top</a>
 </div>

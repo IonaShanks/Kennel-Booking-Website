@@ -17,6 +17,7 @@ namespace Kennels.Controllers
     public class KennelsController : Controller
     {
         public static bool KennelOwner = false;
+        
 
         private KennelsContext db = new KennelsContext();
         private UserManager<ApplicationUser> manager;
@@ -25,11 +26,17 @@ namespace Kennels.Controllers
             db = new KennelsContext();
             manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
         }
-        
+
+        //For use in view
+        public static DateTime searchSt;
+        public static DateTime searchEn;
+        public static bool dateSearch = false;  
+
         // GET: Kennels
         [AllowAnonymous]
         public ActionResult Index(string county, string searchName, DateTime? searchStart, DateTime? searchEnd, string searchRate, string sort)
         {
+            dateSearch = false;
             //To only show specific things to specific users in the view
             KennelOwner = false;
             var currentUser = manager.FindById(User.Identity.GetUserId());
@@ -68,16 +75,20 @@ namespace Kennels.Controllers
             IQueryable<Kennel> kennels = db.Kennel;
                         
             
-            
+            //Search by date
             if (searchStart.HasValue && searchEnd.HasValue)
             {
+                dateSearch = true;
                 //Converts the variables from DateTime? to DateTime 
                 DateTime ss = Convert.ToDateTime(searchStart);
                 DateTime se = Convert.ToDateTime(searchEnd);
 
+                searchSt = ss;
+                searchEn = se;
+
                 //Creates a list of the kennels to be displayed
                 var avList = new List<Kennel>();
-                      
+                     
                 
                 //Loops through every kennel in the kennel database
                 foreach (Kennel kennel in db.Kennel)
@@ -99,30 +110,15 @@ namespace Kennels.Controllers
                     }
                     //If the kennel is not full for any of the days it is added to the list
                     if (kenFull != true)
-                    {
+                    {     
                         avList.Add(kennel);
                     }                    
                 }
-
-                //for (int i = avList.Count(); i > 0; i--)
-                //{
-                //    foreach (Kennel k in avList)
-                //    {
-                //        string view = k.KennelID;
-                //        const int week = 7;
-                //        int estNights = (se - ss).Days;
-                //        double estPrice = ((estNights % week) * k.PricePerNight) + ((estNights / week) * k.PricePerWeek);
-                //        ViewBag.view = "";
-                //    }
-                //}
-                
-
-                kennels = avList.AsQueryable();      
-                     
+                kennels = avList.AsQueryable();                    
             }
 
             
-
+            //Search by rating
             if (!string.IsNullOrEmpty(searchRate))
             {
                 var rateList = new List<Kennel>();
@@ -146,6 +142,7 @@ namespace Kennels.Controllers
                 kennels = rateList.AsQueryable();
             }
 
+            //Sort results
             if (!string.IsNullOrEmpty(sort))
             {
                 //Orders the kennel list based on the sort selected from the list.         
@@ -175,19 +172,20 @@ namespace Kennels.Controllers
                 }
             }
 
+            //Search by name
             if (!string.IsNullOrEmpty(searchName))
             {
                 //Adds the kennels to the list that include the name searched
                 kennels = kennels.Where(n => n.Name.Contains(searchName));              
             }
 
+            //Search by county
             if (!string.IsNullOrEmpty(county))
             {
                 //Adds the kennels to the list that are in the selected county
                 kennels = kennels.Where(c => c.County.ToString() == county);              
             }
-
-
+            
             //Displays the view from all the queries
             return View(kennels);
         }
@@ -201,14 +199,13 @@ namespace Kennels.Controllers
             if (currentUser.UserType == UserType.KennelOwner)
             {                
                 if (kennels != null)
-                {
-                    
+                {   
+                    //Makes a list of all the kennels belonging to the owner and displays them in the view                 
                     var kenList = new List<Kennel>();
                     foreach (Kennel k in kennels)
                     {
                         kenList.Add(k);
                     }
-
                     return View(kenList);
                 }
                 else
@@ -248,6 +245,7 @@ namespace Kennels.Controllers
                 return HttpNotFound();
             }
 
+            //Adds rating to the details section
             var RateQry = db.TotalRating.Where(r => r.KennelID == id).FirstOrDefault();
             if (RateQry != null)
             {
