@@ -345,8 +345,8 @@ namespace Kennels.Controllers
                 return HttpNotFound();
             }
             if (kennels.User != currentUser)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            {                
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "You are not authorized to do that");
             }
             return View(kennels);
         }
