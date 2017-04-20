@@ -115,14 +115,20 @@ namespace Kennels.Controllers
                 return HttpNotFound();
             }
 
-            bool kenOwn = db.Kennel.Where(k => k.User.Id == currentUser.Id && k.KennelID == booking.KennelID) != null;
+            bool kenOwn = false;
+            if (currentUser.UserType == UserType.KennelOwner)
+            {
+                var kk = db.Kennel.Where(k => k.KennelID == booking.KennelID).FirstOrDefault();
+                if (kk.User == currentUser)
+                { kenOwn = true; }
+            }
             //Only if logged in as the user who owns the booking or owner of kennel can you view details about it, otherwise you get an unauthorized error. 
             if (kenOwn == true || booking.User == currentUser)
             {
                 return View(booking);
             }           
             
-            return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
         }
 
         // GET: Bookings/Create
@@ -136,7 +142,7 @@ namespace Kennels.Controllers
             }
             if(currentUser.UserType != UserType.Customer)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
             }
 
             var kID = db.Kennel.Where(k => k.KennelID == id).First();
@@ -268,7 +274,14 @@ namespace Kennels.Controllers
             {
                 return HttpNotFound();
             }
-            bool kenOwn = db.Kennel.Where(k => k.User.Id == currentUser.Id && k.KennelID == booking.KennelID) != null;
+            bool kenOwn = false;
+            
+            if (currentUser.UserType == UserType.KennelOwner)
+            {
+                var kk = db.Kennel.Where(k => k.KennelID == booking.KennelID).FirstOrDefault();
+                if(kk.User == currentUser)
+                { kenOwn = true; }
+            }
             //Only if logged in as the user who owns the booking or owner of kennel can you delete it, otherwise you get an unauthorized error. 
             if (kenOwn == true || booking.User == currentUser)
             {
@@ -277,7 +290,7 @@ namespace Kennels.Controllers
                 return View(booking);
             }
 
-            return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
         }
 
         // POST: Bookings/Delete/{BookingID}

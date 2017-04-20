@@ -312,7 +312,7 @@ namespace Kennels.Controllers
 
             if (kennels.User != currentUser)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
             }
             return View(kennels);
         }

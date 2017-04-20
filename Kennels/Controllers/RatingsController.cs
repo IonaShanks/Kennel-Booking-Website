@@ -45,7 +45,7 @@ namespace Kennels.Controllers
             }
             else
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Kennels.Controllers
             }
             else
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
             }            
         }
 
@@ -194,7 +194,7 @@ namespace Kennels.Controllers
             }
             if (rating.User != currentUser)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
             }
 
             ViewBag.KennelID = new SelectList(db.Kennel, "KennelID", "Name", rating.KennelID);
@@ -247,7 +247,7 @@ namespace Kennels.Controllers
             }
             if (rating.User != currentUser)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
             }
             return View(rating);
         }
