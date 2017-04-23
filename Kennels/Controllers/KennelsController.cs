@@ -198,7 +198,7 @@ namespace Kennels.Controllers
             //If the user type is Kennel Owner
             if (currentUser.UserType == UserType.KennelOwner)
             {                
-                if (kennels != null)
+                if (kennels.Count() > 0)
                 {   
                     //Makes a list of all the kennels belonging to the owner and displays them in the view                 
                     var kenList = new List<Kennel>();

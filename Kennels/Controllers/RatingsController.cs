@@ -35,8 +35,8 @@ namespace Kennels.Controllers
             {
                 Customer = true;
                 //If the Current user has ratings it shows them a list of their ratings, if not it redirects the the create action. 
-                if (ratings != null)
-                { return View(db.Rating.ToList().Where(r => r.User == currentUser)); }
+                if (ratings.Count() > 0)
+                { return View(ratings); }
                 else
                 {
                     ViewBag.NoRate = "No ratings to show.";
@@ -53,7 +53,11 @@ namespace Kennels.Controllers
         [AllowAnonymous]
         public ActionResult KennelRatings(string id)
         {
-            
+            if(id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
             var currentUser = manager.FindById(User.Identity.GetUserId());
             IQueryable<Rating> ratings = db.Rating.Include(r => r.Kennel).Where(b => b.KennelID == id);
 
@@ -66,9 +70,9 @@ namespace Kennels.Controllers
                 }
             }
             //If the Current user has ratings it shows them a list of their ratings, if not it shows an empty list. 
-            if (ratings != null)
+            if (ratings.Count() > 0)
             {                
-                return View(db.Rating.ToList().Where(r => r.KennelID == id));
+                return View(ratings);
             }
             else
             {

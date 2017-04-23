@@ -59,7 +59,7 @@ namespace Kennels.Controllers
             if (currentUser.UserType == UserType.KennelOwner)
             {               
                 var ken = db.Kennel.Where(k => k.User.Id == currentUser.Id);
-                if (ken != null)
+                if (ken.Count() > 0)
                 {
                     var bookedList = new List<Booking>();                    
                     foreach (Kennel k in ken)
@@ -74,6 +74,7 @@ namespace Kennels.Controllers
                 }
                 else
                 {
+                    ViewBag.Empty = "Your kennels have no bookings.";
                     return View(bookings);
                 }
             }
@@ -81,7 +82,7 @@ namespace Kennels.Controllers
             else if (currentUser.UserType == UserType.Customer)
             {              
                 //If the Current user has bookings it shows them a list of their bookings, if not it redirects the the create action. 
-                if (bookings != null)
+                if (bookings.Count() > 0)
                 {
                     return View(db.Booking.Include(k => k.Kennel).ToList().Where(b => b.User == currentUser));
                 }
@@ -94,7 +95,7 @@ namespace Kennels.Controllers
             }
             else
             {
-                return RedirectToAction("Index");
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
         }
 
@@ -157,7 +158,7 @@ namespace Kennels.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         
-        public async Task<ActionResult> Create(string id, [Bind(Include = "BookingID,StartDate,EndDate,TotalNights,Price,KennelID")] Booking booking, KennelAvailability kennelAv)
+        public async Task<ActionResult> Create(string id, [Bind(Include = "BookingID,StartDate,EndDate,TotalNights,Price,KennelID")] Booking booking)
         {
             var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
             
@@ -184,7 +185,7 @@ namespace Kennels.Controllers
                     for (DateTime date = booking.StartDate; date <= booking.EndDate; date = date.AddDays(1))
                     {
                         //for the date the loop is on in the iteration it will check to see if the date already exists
-                        bool dateExists = db.KennelAvailability.Where(k => k.KennelID.ToUpper() == id.ToUpper() && k.BookingDate == date).Count() > 0/*.Any(a => a.BookingDate.Equals(date))*/;
+                        bool dateExists = db.KennelAvailability.Where(k => k.KennelID.ToUpper() == id.ToUpper() && k.BookingDate == date).Count() > 0;
                         
                         //if the date does not exist it will add it to the table                      
                         if (dateExists == false)
