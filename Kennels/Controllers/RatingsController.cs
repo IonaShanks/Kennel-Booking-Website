@@ -218,10 +218,11 @@ namespace Kennels.Controllers
                 var ra = db.Rating.Where(r => r.RatingID == rating.RatingID).First();
                 var tra = db.TotalRating.Where(r => r.KennelID == ra.KennelID).First();
 
-                //Update total ratings by minusing the old rating and adding the new, then calculating the new average.
+                //Update total ratings by minusing the old rating and adding the new, then calculating the new average.                
                 tra.TotalRatings = (tra.TotalRatings - ra.Ratings) + rating.Ratings;
                 tra.AverageRating = tra.calcAvgRating(tra.TotalRatings, tra.TotalRaters);
                 db.Entry(tra).State = EntityState.Modified;
+                
 
                 //Adds the new rating to the queried variable and updates the database with it.
                 ra.Ratings = rating.Ratings;
@@ -266,9 +267,18 @@ namespace Kennels.Controllers
 
             // Minuses 1 from the total raters, Minuses the rating from the total rating
             // Updates total rating table and removes the entry from the rating table
-            tra.TotalRaters -= 1;
-            tra.TotalRatings = (tra.TotalRatings - rating.Ratings);
-            db.Entry(tra).State = EntityState.Modified;
+            if (tra.TotalRaters > 1)
+            {
+                tra.TotalRaters -= 1;
+                tra.TotalRatings = (tra.TotalRatings - rating.Ratings);
+                tra.AverageRating = (tra.TotalRatings / tra.TotalRaters);
+                db.Entry(tra).State = EntityState.Modified;
+            }
+            else
+            {
+                db.TotalRating.Remove(tra);
+            }
+            
             db.Rating.Remove(rating);
             await db.SaveChangesAsync();
             return RedirectToAction("Index");
