@@ -28,7 +28,8 @@
             Customer Rating :
         </dt>
         <dd>
-            @ViewBag.avgRating  @Html.ActionLink(" See all ratings", "KennelRatings", "Ratings", new { id = Model.KennelID }, null)
+            @ViewBag.avgRating  @Html.ActionLink(" See all ratings", "KennelRatings", "Ratings", new { id = Model.KennelID }, null) 
+            @Html.ActionLink("Rate this kennel", "Create", "Ratings", new { id = Model.KennelID}, null)
         </dd>
 
         <dt>

@@ -45,7 +45,8 @@ namespace Kennels.Controllers
             }
             else
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+                TempData["Unauth"] = "You are not authorised to do that, must be logged in as a customer";
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
         }
 
@@ -100,87 +101,95 @@ namespace Kennels.Controllers
         }
 
         // GET: Ratings/Create
-        public ActionResult Create()
+        public ActionResult Create(string id)
         {
             Customer = false;
             var currentUser = manager.FindById(User.Identity.GetUserId());
+            bool ratingExists = db.Rating.Where(r => r.KennelID == id && r.User.Id == currentUser.Id).Count() > 0;
+
+
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            //If user has already rated the kennel 
+            if(ratingExists == true)
+            {
+                //Redirects to the already created rating to edit, with a message        
+                TempData["alreadyRated"] = "You have already rated this kennel you may edit your rating.";                
+                var rateID = db.Rating.Where(r => r.KennelID == id && r.User.Id == currentUser.Id).First();
+                return RedirectToAction("Edit", new { id = rateID.RatingID });
+            }
 
             if (currentUser.UserType == UserType.Customer)
             {             
-                Customer = true;                 
-                ViewBag.KennelID = new SelectList(db.Kennel, "KennelID", "Name");
+                Customer = true;
+                var kID = db.Kennel.Where(k => k.KennelID == id).First();
+                ViewBag.KennelName = kID.Name;
                 return View();
             }
             else
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+                TempData["Unauth"] = "You are not authorised to do that, you must be logged in as a customer";
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }            
         }
 
         // POST: Ratings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "RatingID,Ratings,KennelID,Comment,RatingDate")] Rating rating)
-        {       
+        public async Task<ActionResult> Create(string id, [Bind(Include = "RatingID,Ratings,KennelID,Comment,RatingDate")] Rating rating)
+        {
             var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
-            
-            bool ratingExists = db.Rating.Where(r => r.KennelID == rating.KennelID && r.User.Id == currentUser.Id).Count() > 0;
 
-            if (ratingExists == false)
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                bool totalRatingExists = db.TotalRating.Where(k => k.KennelID == id).Count() > 0;
+
+                //if the kennel has never been rated it will add an initial rating                      
+                if (totalRatingExists == false)
                 {
-                    bool totalRatingExists = db.TotalRating.Where(k => k.KennelID == rating.KennelID).Count() > 0;
-
-                    //if the kennel has never been rated it will add an initial rating                      
-                    if (totalRatingExists == false)
+                    var newTRate = new TotalRating()
                     {
-                        var newTRate = new TotalRating()
-                        {
-                            KennelID = rating.KennelID,
-                            TotalRatings = rating.Ratings,
-                            TotalRaters = 1,
-                            AverageRating = rating.Ratings
+                        KennelID = id,
+                        TotalRatings = rating.Ratings,
+                        TotalRaters = 1,
+                        AverageRating = rating.Ratings
 
-                        };
+                    };
 
-                        db.TotalRating.Add(newTRate);
-                        await db.SaveChangesAsync();
-                    }
-
-                    //if the kennel has been rated previously (by any user) it will update the existing entry.
-                    else
-                    {
-                        //Adds 1 to total Raters on the TotalRatings table where the KennelId match those of the rating.
-                        //Adds the rating to the TotalRatings.
-                        //Updates AverageRating
-                        var tra = db.TotalRating.Where(r => r.KennelID == rating.KennelID).First();
-                        tra.TotalRaters += 1;
-                        tra.TotalRatings += rating.Ratings;
-                        tra.AverageRating = tra.calcAvgRating(tra.TotalRatings, tra.TotalRaters);
-                        db.Entry(tra).State = EntityState.Modified;
-                        await db.SaveChangesAsync();
-                    }
-
-                    rating.RatingDate = DateTime.Now;
-                    rating.User = currentUser;
-                    db.Rating.Add(rating);
+                    db.TotalRating.Add(newTRate);
                     await db.SaveChangesAsync();
-                    return RedirectToAction("Index");
                 }
 
-                return View(rating);
-            }
-            else
-            {
-                ViewBag.AlreadyRated = "You have already rated this kennel you may edit your rating.";
-                //Redirects to the already created rating to edit so each user may only add one rating per kennel
-                var rateID = db.Rating.Where(r => r.KennelID == rating.KennelID && r.User.Id == currentUser.Id).First();
-                return RedirectToAction("Edit", new { id = rateID.RatingID });
+                //if the kennel has been rated previously (by any user) it will update the existing entry.
+                else
+                {
+                    //Adds 1 to total Raters on the TotalRatings table where the KennelId match those of the rating.
+                    //Adds the rating to the TotalRatings.
+                    //Updates AverageRating
+                    var tra = db.TotalRating.Where(r => r.KennelID == id).First();
+                    tra.TotalRaters += 1;
+                    tra.TotalRatings += rating.Ratings;
+                    tra.AverageRating = tra.calcAvgRating(tra.TotalRatings, tra.TotalRaters);
+                    db.Entry(tra).State = EntityState.Modified;
+                    await db.SaveChangesAsync();
+                }
+
+                rating.RatingDate = DateTime.Now;
+                rating.User = currentUser;
+                rating.KennelID = id;
+                db.Rating.Add(rating);
+                await db.SaveChangesAsync();
+
+                TempData["Thank"] = "Thank you for your rating";
+                return RedirectToAction("Index");
             }
 
-
+            return View(rating);
         }
+
 
         // GET: Ratings/Edit/{RatingID}
         public async Task<ActionResult> Edit(int? id)
@@ -198,7 +207,8 @@ namespace Kennels.Controllers
             }
             if (rating.User != currentUser)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+                TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
 
             ViewBag.KennelID = new SelectList(db.Kennel, "KennelID", "Name", rating.KennelID);
@@ -230,6 +240,8 @@ namespace Kennels.Controllers
                 ra.RatingDate = DateTime.Now;
                 db.Entry(ra).State = EntityState.Modified;
                 await db.SaveChangesAsync();
+                
+                TempData["Thank"] = "Rating Updated";
                 return RedirectToAction("Index");
             }
 
@@ -252,7 +264,8 @@ namespace Kennels.Controllers
             }
             if (rating.User != currentUser)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+                TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
             return View(rating);
         }
@@ -281,6 +294,7 @@ namespace Kennels.Controllers
             
             db.Rating.Remove(rating);
             await db.SaveChangesAsync();
+            TempData["Thank"] = "Rating Removed"; 
             return RedirectToAction("Index");
         }
 

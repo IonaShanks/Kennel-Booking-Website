@@ -17,7 +17,7 @@ namespace Kennels.Controllers
     public class KennelsController : Controller
     {
         public static bool KennelOwner = false;
-        
+        public static IQueryable<TotalRating> rate;
 
         private KennelsContext db = new KennelsContext();
         private UserManager<ApplicationUser> manager;
@@ -72,7 +72,7 @@ namespace Kennels.Controllers
             SortList.Add("Price per Week (L-H)");
             ViewBag.sort = new SelectList(SortList);
                         
-            IQueryable<Kennel> kennels = db.Kennel;
+            IQueryable<Kennel> kennels = db.Kennel.Include(k => k.TotalRating);
                         
             
             //Search by date
@@ -183,9 +183,11 @@ namespace Kennels.Controllers
             if (!string.IsNullOrEmpty(county))
             {
                 //Adds the kennels to the list that are in the selected county
-                kennels = kennels.Where(c => c.County.ToString() == county);              
+                kennels = kennels.Where(c => c.County.ToString() == county);
             }
+
             
+            rate = db.TotalRating; 
             //Displays the view from all the queries
             return View(kennels);
         }
@@ -274,6 +276,12 @@ namespace Kennels.Controllers
         // GET: Kennels/Create
         public ActionResult Create()
         {
+            var currentUser = manager.FindById(User.Identity.GetUserId());
+            if (currentUser.UserType != UserType.KennelOwner)
+            {
+                TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
             return View();
         }
 
@@ -312,7 +320,8 @@ namespace Kennels.Controllers
 
             if (kennels.User != currentUser)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+                TempData["Unauth"] = "You are not authorised to do that, you do not own this kennel";
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
             return View(kennels);
         }
@@ -346,7 +355,8 @@ namespace Kennels.Controllers
             }
             if (kennels.User != currentUser)
             {                
-                return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "You are not authorized to do that");
+                TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
             return View(kennels);
         }

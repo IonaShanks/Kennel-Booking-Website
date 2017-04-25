@@ -127,9 +127,10 @@ namespace Kennels.Controllers
             if (kenOwn == true || booking.User == currentUser)
             {
                 return View(booking);
-            }           
-            
-            return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+            }
+
+            TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
+            return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
         }
 
         // GET: Bookings/Create
@@ -143,7 +144,8 @@ namespace Kennels.Controllers
             }
             if(currentUser.UserType != UserType.Customer)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+                TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
 
             var kID = db.Kennel.Where(k => k.KennelID == id).First();
@@ -241,8 +243,8 @@ namespace Kennels.Controllers
 
                     //Sends the email
                     SendConfirmation(Message, Subject);
-                    
-                    
+
+                    TempData["Thank"] = "Thank you for your booking";
                     return RedirectToAction("Index");
                 }
 
@@ -253,8 +255,8 @@ namespace Kennels.Controllers
             else
             {
                 //return a view where it says that one or more of the dates selected is full. 
-                ViewBag.KennelID = new SelectList(db.Kennel, "KennelID", "Name", booking.KennelID);                
-                ViewBag.Message = kennel.Name + " is not available for the selected dates.";
+                ViewBag.KennelID = new SelectList(db.Kennel, "KennelID", "Name", booking.KennelID);                     
+                ModelState.AddModelError("", "Kennel full on selected dates");
                 return View(booking);
             }
         }
@@ -291,7 +293,8 @@ namespace Kennels.Controllers
                 return View(booking);
             }
 
-            return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+            TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
+            return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
         }
 
         // POST: Bookings/Delete/{BookingID}

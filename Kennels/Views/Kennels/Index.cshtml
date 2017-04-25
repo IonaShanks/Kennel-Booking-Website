@@ -7,13 +7,14 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<h2>Find Kennels</h2>
 
 
 
 <p>
-   @if (KennelsController.KennelOwner == true)
-   {@Html.ActionLink("My Kennels", "MyKennels"); }
+    @if (KennelsController.KennelOwner == true)
+    {@Html.ActionLink("My Kennels", "MyKennels");
+    }
 </p>
 
 
@@ -21,53 +22,55 @@
 @using (Html.BeginForm("Index", "Kennels", FormMethod.Get))
 
 {
+    <hr/>
+    <h3> Search by: </h3>
     <div class="row">
-               
-            <div class="col-md-12">
 
-                <div class="form-group, col-md-4">
-                    <label class="control-label" for="inputDefault">County:</label>
-                    @Html.DropDownList("county", (SelectList)ViewBag.county, "All", new { @class = "form-control" })
-                </div>
+        <div class="col-md-12">
 
-                <div class="form-group, col-md-4">
-                    <label class="control-label" for="inputDefault">Name: </label>
-                    @Html.TextBox("searchName", "", new { @class = "form-control" })
-                </div>
-
-                <div class="form-group, col-md-4">
-                    <label class="control-label" for="inputDefault">Minimum Rating:</label>
-                    @Html.DropDownList("searchRate", (SelectList)ViewBag.rate, "All", new { @class = "form-control" })
-                </div>                
-            
-                <div class="form-group, col-md-4">
-                    <br />
-                    <label class="control-label" for="inputDefault">Start Date: </label>
-                    @Html.TextBox("searchStart", "", new { type = "date", @class = "form-control" })
-                </div>
-
-                <div class="form-group, col-md-4">
-                    <br />
-                    <label class="control-label" for="inputDefault">End Date: </label>
-                    @Html.TextBox("searchEnd", "", new { type = "date", @class = "form-control" })
-                </div>
-
-                <div class="form-group, col-md-4">
-                    <br /> 
-                    <label class="control-label" for="inputDefault">Sort By:</label>
-                    @Html.DropDownList("sort", (SelectList)ViewBag.sort, "All", new { @class = "form-control" })
-                </div>
-
-                <div class="form-group, col-md-4">
-                    <br />
-                    
-                    <button class="btn btn-default" type="submit">Filter</button>
-                </div>
+            <div class="form-group, col-md-4">
+                <label class="control-label" for="inputDefault">County:</label>
+                @Html.DropDownList("county", (SelectList)ViewBag.county, "All", new { @class = "form-control" })
             </div>
-        </div>   
-   
 
-    <hr />
+            <div class="form-group, col-md-4">
+                <label class="control-label" for="inputDefault">Name: </label>
+                @Html.TextBox("searchName", "", new { @class = "form-control" })
+            </div>
+
+            <div class="form-group, col-md-4">
+                <label class="control-label" for="inputDefault">Minimum Rating:</label>
+                @Html.DropDownList("searchRate", (SelectList)ViewBag.rate, "All", new { @class = "form-control" })
+            </div>
+
+            <div class="form-group, col-md-4">
+                <br />
+                <label class="control-label" for="inputDefault">Start Date: </label>
+                @Html.TextBox("searchStart", "", new { type = "date", @class = "form-control" })
+            </div>
+
+            <div class="form-group, col-md-4">
+                <br />
+                <label class="control-label" for="inputDefault">End Date: </label>
+                @Html.TextBox("searchEnd", "", new { type = "date", @class = "form-control" })
+            </div>
+
+            <div class="form-group, col-md-4">
+                <br />
+                <label class="control-label" for="inputDefault">Sort By:</label>
+                @Html.DropDownList("sort", (SelectList)ViewBag.sort, "All", new { @class = "form-control" })
+            </div>
+
+            <div class="form-group, col-md-4">
+                <br />
+
+                <button class="btn btn-default" type="submit">Filter</button>
+            </div>
+        </div>
+    </div>
+
+
+        <hr />
 
 }
 @foreach (var item in Model)
@@ -76,9 +79,25 @@
 
         <h3>@Html.ActionLink(item.Name, "Details", new { id = item.KennelID })</h3>
 
+        @{ var avgRate = KennelsController.rate.Where(r => r.KennelID == item.KennelID).FirstOrDefault();}
 
         <dl class="dl-horizontal">
+            <dt>
+                Kennel Rating
+            </dt>
 
+            @if (avgRate == null)
+            {
+                <dd>
+                    Not yet rated
+                </dd>
+            }
+            else
+            {
+                <dd>
+                    @Html.Raw(avgRate.AverageRating.ToString())
+                </dd>
+            }
             <dt>
                 @Html.DisplayNameFor(model => model.County)
             </dt>
@@ -130,17 +149,18 @@
             @* Calculates an estimate of price *@
             @if (KennelsController.dateSearch == true)
             {
-            <dt style="color:green;"><h4>Estimated Price</h4></dt>
-            <dd>@{const int week = 7;
-                int estNights = (KennelsController.searchEn - KennelsController.searchSt).Days;
-                double estPrice = ((estNights % week) * item.PricePerNight) + ((estNights / week) * item.PricePerWeek);}
+                <dt style="color:green;"><h4>Estimated Price</h4></dt>
+                <dd>
+                    @{const int week = 7;
+                    int estNights = (KennelsController.searchEn - KennelsController.searchSt).Days;
+                    double estPrice = ((estNights % week) * item.PricePerNight) + ((estNights / week) * item.PricePerWeek);}
                 <h4>€@estPrice</h4>
             </dd>
-            }
+                    }
 
         </dl>
     </div>
-    }
+                    }
 
 <div style="clear: both;">
     <a href="#top">Back to top</a>

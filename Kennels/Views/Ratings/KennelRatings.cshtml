@@ -13,12 +13,6 @@
         @Html.ActionLink("My Ratings", "Index")
     </p>    
 }
-@if (Request.IsAuthenticated != true)                   
-{
-    <p>
-        @Html.ActionLink("Rate a Kennel", "Create")
-    </p>
-}
 
 <table class="table">
     <tr>
