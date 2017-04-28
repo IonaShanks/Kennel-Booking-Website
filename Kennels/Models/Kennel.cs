@@ -18,26 +18,25 @@ namespace Kennels.Models
         public String Name { get; set; }
         [Required]
         public String Address { get; set; }
+        [Required, Display(Name ="Town/City")]
+        public String Town {get; set;}
         [Required]
-        public County County { get; set; }
+        public County County { get; set; }        
         [Required, Phone, Display(Name = "Phone Number")]
         public String PhoneNumber { get; set; }
         [EmailAddress, Display(Name= "Email")]
         public String Email { get; set; }
         [Required, Range(1, Int32.MaxValue, ErrorMessage = "{0} must be greater than 0.")]
         public int Capacity { get; set; }
-        //[Required]
-        //public bool Grooming { get; set; }
-        //[Required]
-        //public bool Training { get; set; }
+        
         [DisplayFormat(DataFormatString = "{0:C}")]
         [Required, Display(Name = "Price per Night"), Range(0.01, Int32.MaxValue, ErrorMessage = "{0} must be greater than 0.")]
         public double PricePerNight { get; set; }
         [DisplayFormat(DataFormatString = "{0:C}")]
         [Required, Display(Name = "Price per Week"), Range(0.01, Int32.MaxValue, ErrorMessage = "{0} must be greater than 0.")]
         public double PricePerWeek { get; set; }
-        //[Required, Display(Name = "Maximum Days"), Range(1, Int32.MaxValue, ErrorMessage = "{0} must be greater than 0.") ]
-        //public int MaxDays { get; set; }
+        [Required, Display(Name = "Maximum Nights"), Range(1, Int32.MaxValue, ErrorMessage = "{0} must be greater than 0.")]
+        public int MaxDays { get; set; }
         [Required, Display(Name = "Large Dog")]
         public bool LgeDog { get; set; }
         [Required, Display(Name = "Medium Dog")]
@@ -46,6 +45,12 @@ namespace Kennels.Models
         public bool SmlDog { get; set; }
         [Required, Display(Name = "Cancellation Period (Hours)"), Range(1, Int32.MaxValue, ErrorMessage = "{0} must be greater than 0.")]
         public double CancellationPeriod { get; set; }
+        [Display(Name ="Kennel Description")/* MaxLength(250, ErrorMessage = "{0} must be less than 250 characters.")*/]
+        public String Description { get; set; }
+        [Required]
+        public bool Grooming { get; set; }
+        [Required]
+        public bool Training { get; set; }
 
         public ApplicationUser User { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }

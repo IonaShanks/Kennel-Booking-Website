@@ -150,23 +150,23 @@ namespace Kennels.Controllers
                 {
                     kennels = kennels.OrderBy(k => k.Name);
                 }
-                if (sort == "Name (Z-A)")
+                else if (sort == "Name (Z-A)")
                 {
                     kennels = kennels.OrderByDescending(k => k.Name);
                 }
-                if (sort == "Price per Night (H-L)")
+                else if (sort == "Price per Night (H-L)")
                 {
                     kennels = kennels.OrderByDescending(k => k.PricePerNight);
                 }
-                if (sort == "Price per Night (L-H)")
+                else if (sort == "Price per Night (L-H)")
                 {
                     kennels = kennels.OrderBy(k => k.PricePerNight);
                 }
-                if (sort == "Price per Week (H-L)")
+                else if (sort == "Price per Week (H-L)")
                 {
                     kennels = kennels.OrderByDescending(k => k.PricePerWeek);
                 }
-                if (sort == "Price per Week (L-H)")
+                else /*if (sort == "Price per Week (L-H)")*/
                 {
                     kennels = kennels.OrderBy(k => k.PricePerWeek);
                 }
@@ -288,7 +288,7 @@ namespace Kennels.Controllers
         // POST: Kennels/Create        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "KennelID,Name,Address,County,PhoneNumber,Email,Capacity,PricePerNight,PricePerWeek,LgeDog,MedDog,SmlDog,CancellationPeriod")] Kennel kennels)
+        public async Task<ActionResult> Create([Bind(Include = "KennelID,Name,Address,County,Town,PhoneNumber,Email,Capacity,PricePerNight,PricePerWeek,MaxDays,LgeDog,MedDog,SmlDog,CancellationPeriod,Description,Grooming,Training")] Kennel kennels)
         {
 
             var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
@@ -329,7 +329,7 @@ namespace Kennels.Controllers
         // POST: Kennels/Edit/{KennelID}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "KennelID,Name,Address,County,PhoneNumber,Email,Capacity,PricePerNight,PricePerWeek,LgeDog,MedDog,SmlDog,CancellationPeriod")] Kennel kennels)
+        public async Task<ActionResult> Edit([Bind(Include = "KennelID,Name,Address,County,Town,PhoneNumber,Email,Capacity,PricePerNight,PricePerWeek,MaxDays,LgeDog,MedDog,SmlDog,CancellationPeriod,Description,Grooming,Training")] Kennel kennels)
         {
             if (ModelState.IsValid)
             {

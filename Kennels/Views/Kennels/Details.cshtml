@@ -15,41 +15,94 @@
     }
     @if (KennelsController.KennelOwner == true)
     {        
-            @Html.ActionLink("Edit Kennel", "Edit", "Kennels", new { id = Model.KennelID }, null)        
+            @Html.ActionLink("Update Kennel", "Edit", "Kennels", new { id = Model.KennelID }, null)        
     }
 </h4>
 
 
 <div>
-    <h4></h4>
+
     <hr />
+    <div class="col-md-4">
+        <h4>@Html.DisplayNameFor(model => model.Address)</h4>
+        <div>
+            <span>
+                @Html.DisplayFor(model => model.Address)
+            </span>
+            <br />
+            <span>
+                @Html.DisplayFor(model => model.Town)
+            </span>
+            <br />
+            <span>
+                @Html.DisplayFor(model => model.County)
+            </span>
+        </div>
+        <br />
+        <p>
+            Tel: @Html.DisplayFor(model => model.PhoneNumber)
+            <br />
+            @Html.DisplayNameFor(model => model.Email) : @Html.DisplayFor(model => model.Email)
+        </p>
+    </div>
+    
+    <div class="col-md-8">
+
+        <h4>Customer Rating </h4>
+        <p>
+            @ViewBag.avgRating 
+            <br />
+             @Html.ActionLink(" See all ratings", "KennelRatings", "Ratings", new { id = Model.KennelID }, null)
+            @if (KennelsController.KennelOwner == false)
+            {<br />
+                @Html.ActionLink("Rate this kennel", "Create", "Ratings", new { id = Model.KennelID }, null)}
+        </p>
+    </div>
+    <br style="clear: both;">
+    <br />
+    <hr style="clear: both;"/>
+    <div style="color: darkblue;">
+        
+        <h3>About @Html.DisplayFor(model => model.Name) </h3>
+       
+    </div>
+    <hr style="clear: both;"/>
+    
+
+    <p class="col-md-12">
+        @Html.DisplayFor(model => model.Description)
+    </p>
+
+
+
     <dl class="dl-horizontal">
-        <dt>
+        @*<dt>
             Customer Rating :
         </dt>
         <dd>
-            @ViewBag.avgRating  @Html.ActionLink(" See all ratings", "KennelRatings", "Ratings", new { id = Model.KennelID }, null) 
-            @Html.ActionLink("Rate this kennel", "Create", "Ratings", new { id = Model.KennelID}, null)
+            @ViewBag.avgRating  @Html.ActionLink(" See all ratings", "KennelRatings", "Ratings", new { id = Model.KennelID }, null)
+            @if (KennelsController.KennelOwner == false)
+            {@Html.ActionLink("Rate this kennel", "Create", "Ratings", new { id = Model.KennelID }, null)}
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Address) : 
+            @Html.DisplayNameFor(model => model.Address) :
         </dt>
 
         <dd>
             @Html.DisplayFor(model => model.Address)
         </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.County) : 
-        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Town)
+        </dd>
 
         <dd>
             @Html.DisplayFor(model => model.County)
         </dd>
 
+
         <dt>
-            @Html.DisplayNameFor(model => model.PhoneNumber) : 
+            @Html.DisplayNameFor(model => model.PhoneNumber) :
         </dt>
 
         <dd>
@@ -57,15 +110,15 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Email) : 
+            @Html.DisplayNameFor(model => model.Email) :
         </dt>
 
         <dd>
             @Html.DisplayFor(model => model.Email)
-        </dd>
+        </dd>*@
 
         <dt>
-            @Html.DisplayNameFor(model => model.Capacity) : 
+            @Html.DisplayNameFor(model => model.Capacity) :
         </dt>
 
         <dd>
@@ -73,7 +126,7 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.PricePerNight) : 
+            @Html.DisplayNameFor(model => model.PricePerNight) :
         </dt>
 
         <dd>
@@ -81,7 +134,7 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.PricePerWeek) : 
+            @Html.DisplayNameFor(model => model.PricePerWeek) :
         </dt>
 
         <dd>
@@ -89,7 +142,7 @@
         </dd>
 
         <dt>
-            Cancellation Period : 
+            Cancellation Period :
         </dt>
 
         <dd>
@@ -97,7 +150,7 @@
         </dd>
 
         <dt>
-            Type of dogs : 
+            Type of dogs :
         </dt>
         <dd>
             <div class="row">
@@ -117,10 +170,14 @@
                 </div>
             </div>
         </dd>
-
-    
-
     </dl>
+
+    <h4>Other Services</h4>
+    @Html.DisplayNameFor(model => model.Grooming)
+    @Html.DisplayFor(model => model.Grooming)
+    <br />
+    @Html.DisplayNameFor(model => model.Training)
+    @Html.DisplayFor(model => model.Training)
 </div>
 
 <p>

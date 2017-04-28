@@ -40,6 +40,14 @@
         </div>
 
         <div class="form-group">
+            @Html.LabelFor(model => model.Town, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Town, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Town, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
             @Html.LabelFor(model => model.County, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EnumDropDownListFor(model => model.County, htmlAttributes: new { @class = "form-control" })
@@ -68,6 +76,14 @@
             <div class="col-md-10">
                 @Html.EditorFor(model => model.Capacity, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.Capacity, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MaxDays, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.MaxDays, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.MaxDays, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -117,6 +133,35 @@
             <div class="col-md-10">
                 @Html.EditorFor(model => model.CancellationPeriod, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.CancellationPeriod, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label, col-md-2">
+                <strong>Extras</strong>
+            </div>
+
+            <div class="row">
+                <div class="col-md-1">
+                    @Html.DisplayNameFor(model => model.Grooming)
+
+                    @Html.CheckBoxFor(model => model.Grooming)
+
+                    @Html.ValidationMessageFor(model => model.Grooming, "", new { @class = "text-danger" })
+                </div>
+                <div class="col-md-1">
+                    @Html.DisplayNameFor(model => model.Training)
+                    @Html.CheckBoxFor(model => model.Training)
+                    @Html.ValidationMessageFor(model => model.Training, "", new { @class = "text-danger" })
+                </div>                
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
             </div>
         </div>
 
