@@ -50,7 +50,9 @@ namespace Kennels.Models
         public DateTime StartDate { get; set; }
         [Required, DataType(DataType.Date), DateAfter("StartDate")/*(ErrorMessage = "Stay must be at least one night")*/, Display(Name ="To")]        
         public DateTime EndDate { get; set; }
-        
+        [Phone, Display(Name = "Contact Number")]
+        public string PhoneNumber { get; set; }
+
         //Calculates the total nights based on the start and end date entered by the user. 
         public int TotalNights { get; set; }
 

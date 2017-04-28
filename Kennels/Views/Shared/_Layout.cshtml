@@ -30,16 +30,15 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Kennel Finder", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("Kennel Finder", "Index", "Kennels", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Kennels", "Index", "Kennels")</li>
+                <ul class="nav navbar-nav">                    
                     @if (Request.IsAuthenticated)
                     {
                         <li>@Html.ActionLink("Bookings", "Index", "Bookings")</li>       
                     }
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
@@ -51,7 +50,7 @@
         <hr />
         <footer>
             <p>&copy; @DateTime.Now.Year - Hdip Final Project</p>
-            <a href="https://seal.beyondsecurity.com/vulnerability-scanner-verification/iskennels.azurewebsites.net"><img src="https://seal.beyondsecurity.com/verification-images/iskennels.azurewebsites.net/vulnerability-scanner-2.gif" alt="Website Security Test" border="0" /></a>
+            
 
         </footer>
     </div>

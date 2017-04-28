@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<Kennels.Models.Booking>
+@using Kennels.Controllers;
 
 @{
     ViewBag.Title = "Index";
@@ -10,11 +11,21 @@
 <p style="color: lawngreen;">
     @TempData["Thank"]
 </p>
+<p style="color: red;">
+    @TempData["tooSoon"]
+</p>
+
 <table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.Kennel.Name)
         </th>
+        @if(BookingsController.KennelOwner == true)
+        {
+            <th>
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </th>
+        }
         <th>
             @Html.DisplayNameFor(model => model.StartDate)
         </th>
@@ -37,6 +48,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Kennel.Name)
             </td>
+            @if (BookingsController.KennelOwner == true)
+            {
+                <th>
+                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                </th>
+            }
             <td>
                 @Html.DisplayFor(modelItem => item.StartDate)
             </td>
