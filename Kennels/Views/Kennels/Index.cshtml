@@ -94,8 +94,12 @@
             }
             else
             {
+                string avRate = avgRate.AverageRating.ToString();
+
+                if (avRate.Length > 3)
+                { avRate = avRate.Substring(0, 3); }
                 <dd>
-                    @Html.Raw(avgRate.AverageRating.ToString())
+                    @Html.Raw(avRate)
                 </dd>
             }
             <dt>
