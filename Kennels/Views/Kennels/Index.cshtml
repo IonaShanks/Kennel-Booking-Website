@@ -39,7 +39,7 @@
             </div>
 
             <div class="form-group, col-md-4">
-                <label class="control-label" for="inputDefault">Minimum Rating:</label>
+                <label class="control-label" for="inputDefault">Minimum Star Rating:</label>
                 @Html.DropDownList("searchRate", (SelectList)ViewBag.rate, "All", new { @class = "form-control" })
             </div>
 
@@ -98,8 +98,14 @@
 
                 if (avRate.Length > 3)
                 { avRate = avRate.Substring(0, 3); }
+
+                string star = "Stars";
+                    if (avgRate.AverageRating == 1)
+                    {
+                        star = "Star";
+                    }
                 <dd>
-                    @Html.Raw(avRate)
+                    @Html.Raw(avRate) @star
                 </dd>
             }
             <dt>

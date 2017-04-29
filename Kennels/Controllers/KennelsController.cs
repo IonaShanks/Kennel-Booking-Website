@@ -252,9 +252,11 @@ namespace Kennels.Controllers
             if (RateQry != null)
             {
                 string tr = " Reviews";
+                string st = " Stars";
                 if (RateQry.TotalRaters == 1)
                 {
                     tr = " Review";
+                    st = "Star";
                 }
                 //Shorten the string if it's longer than 3 characters long (e.g 2.5466 = 2.5)
                 string avRate = RateQry.AverageRating.ToString();
@@ -262,7 +264,7 @@ namespace Kennels.Controllers
                 {
                     avRate = avRate.Substring(0, 3);
                 }
-                ViewBag.avgRating = avRate + " out of 5 (" + RateQry.TotalRaters + tr + ")";
+                ViewBag.avgRating = avRate + " " + st + " (" + RateQry.TotalRaters + tr + ")";
             }
             else
             {

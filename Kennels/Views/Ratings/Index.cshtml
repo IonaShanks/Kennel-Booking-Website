@@ -33,7 +33,12 @@
                 @Html.DisplayFor(modelItem => item.Kennel.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Ratings)
+                @{string star = "Stars";}
+                @if (item.Ratings == 1)
+                {
+                    star = "Star";
+                }
+                @Html.DisplayFor(modelItem => item.Ratings) @star
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Comment)
