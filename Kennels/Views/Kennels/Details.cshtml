@@ -10,11 +10,10 @@
 <h4>
     @if (KennelsController.KennelOwner == false)
     {
-
-        @Html.ActionLink("Book This Kennel", "Create", "Bookings", new { id = Model.KennelID }, null)
+        <button class="btn btn-default" onclick="location.href='@Url.Action("Create", "Bookings", new { id = Model.KennelID}, null)';return false;">Book This Kennel</button>       
     }
     @if (KennelsController.KennelOwner == true)
-    {        
+    {
             @Html.ActionLink("Update Kennel", "Edit", "Kennels", new { id = Model.KennelID }, null)        
     }
 </h4>
@@ -64,7 +63,19 @@
         
     </div>
     <br style="clear: both;">
+   
     <br />
+    <p>
+        @if (KennelsController.KennelOwner == false)
+        {
+            @Html.ActionLink("Back to All Kennels", "Index")
+        }
+        @if (KennelsController.KennelOwner == true)
+        {
+            @Html.ActionLink("Back to My Kennels", "MyKennels")
+        }
+
+    </p>
     <hr style="clear: both;"/>
     <div style="color: darkblue;">
         
@@ -72,128 +83,70 @@
        
     </div>
     <hr style="clear: both;"/>
-    
-
-    <p class="col-md-12">
-        @Html.DisplayFor(model => model.Description)
-    </p>
 
 
 
-    <dl class="dl-horizontal">
-        @*<dt>
-            Customer Rating :
-        </dt>
-        <dd>
-            @ViewBag.avgRating  @Html.ActionLink(" See all ratings", "KennelRatings", "Ratings", new { id = Model.KennelID }, null)
-            @if (KennelsController.KennelOwner == false)
-            {@Html.ActionLink("Rate this kennel", "Create", "Ratings", new { id = Model.KennelID }, null)}
-        </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Address) :
-        </dt>
+    <div class="col-md-12">
+        <h4>Kennel Description</h4>
+        <ul style="list-style: none;">
+            <li style="padding-bottom:1em;">
+                @Html.DisplayFor(model => model.Description)
+            </li>
 
-        <dd>
-            @Html.DisplayFor(model => model.Address)
-        </dd>
-        <dd>
-            @Html.DisplayFor(model => model.Town)
-        </dd>
-
-        <dd>
-            @Html.DisplayFor(model => model.County)
-        </dd>
+            <li style="padding-bottom:1em;">
+                @Html.DisplayFor(model => model.Name) has a maximum capacity of @Html.DisplayFor(model => model.Capacity) dogs.
+            </li>
+            <li style="padding-bottom:1em;">
+                @Html.DisplayFor(model => model.Name) accepts the following types of dogs:
+            </li>
 
 
-        <dt>
-            @Html.DisplayNameFor(model => model.PhoneNumber) :
-        </dt>
+            <li style="padding-left: 2em; display:inline;">
+                @Html.DisplayNameFor(model => model.LgeDog)
+                @Html.DisplayFor(model => model.LgeDog)
+            </li>
+            <li style="padding-left: 1em; display:inline;">
+                @Html.DisplayNameFor(model => model.MedDog)
+                @Html.DisplayFor(model => model.MedDog)
+            </li>
+            <li style="padding-left: 1em; display:inline;">
+                @Html.DisplayNameFor(model => model.SmlDog)
+                @Html.DisplayFor(model => model.SmlDog)
+            </li>
 
-        <dd>
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Email) :
-        </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Email)
-        </dd>*@
+        </ul>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Capacity) :
-        </dt>
+        <br />
+        <h4>Price and Policy</h4>
+        <ul>
+            <li>
+                The price per night, per dog, is @Html.DisplayFor(model => model.PricePerNight).
+            </li>
+            <li>
+                The price per week, per dog, is @Html.DisplayFor(model => model.PricePerWeek)
+            </li>
+            <li>
+                You may cancel a booking up to @Html.DisplayFor(model => model.CancellationPeriod) hours before the booking date.
+            </li>
+        </ul>
+        <br />
+        <h4>Other Services</h4>
+        <ul>
+            <li>
+                @Html.DisplayNameFor(model => model.Grooming)
+                @Html.DisplayFor(model => model.Grooming)
+            </li>
+            <li>
+                @Html.DisplayNameFor(model => model.Training)
+                @Html.DisplayFor(model => model.Training)
+            </li>
+        </ul>
+    </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.Capacity)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.PricePerNight) :
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.PricePerNight)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.PricePerWeek) :
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.PricePerWeek)
-        </dd>
-
-        <dt>
-            Cancellation Period :
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.CancellationPeriod) (Hours)
-        </dd>
-
-        <dt>
-            Type of dogs :
-        </dt>
-        <dd>
-            <div class="row">
-                <div class="col-md-1">
-                    @Html.DisplayNameFor(model => model.LgeDog)
-                    @Html.DisplayFor(model => model.LgeDog)
-                </div>
-
-                <div class="col-md-1">
-                    @Html.DisplayNameFor(model => model.MedDog)
-                    @Html.DisplayFor(model => model.MedDog)
-                </div>
-
-                <div class="col-md-1">
-                    @Html.DisplayNameFor(model => model.SmlDog)
-                    @Html.DisplayFor(model => model.SmlDog)
-                </div>
-            </div>
-        </dd>
-    </dl>
-
-    <h4>Other Services</h4>
-    @Html.DisplayNameFor(model => model.Grooming)
-    @Html.DisplayFor(model => model.Grooming)
-    <br />
-    @Html.DisplayNameFor(model => model.Training)
-    @Html.DisplayFor(model => model.Training)
 </div>
 
-<p>
-    @if (KennelsController.KennelOwner == false)
-    {
-        @Html.ActionLink("Back to All Kennels", "Index")
-    }
-    @if (KennelsController.KennelOwner == true)
-    {        
-            @Html.ActionLink("Back to My Kennels", "MyKennels")        
-    }
 
-</p>
 

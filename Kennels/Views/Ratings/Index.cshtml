@@ -30,7 +30,7 @@
     {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Kennel.Name)
+                @Html.ActionLink(@item.Kennel.Name, "KennelRatings", "ratings", new { id = "dit123" }, null)
             </td>
             <td>
                 @{string star = "Stars";}

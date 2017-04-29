@@ -16,6 +16,7 @@ namespace Kennels.Controllers
     public class RatingsController : Controller
     {
         public static bool Customer = false;
+        public static string kenID; 
 
         private KennelsContext db = new KennelsContext();
         private UserManager<ApplicationUser> manager;
@@ -70,6 +71,7 @@ namespace Kennels.Controllers
                     Customer = true;
                 }
             }
+            kenID = id; 
             //If the Current user has ratings it shows them a list of their ratings, if not it shows an empty list. 
             if (ratings.Count() > 0)
             {                

@@ -10,9 +10,12 @@
 @if (RatingsController.Customer == true)
 {
     <p>
-        @Html.ActionLink("My Ratings", "Index")
+        @Html.ActionLink("Manage My Ratings", "Index")
     </p>    
 }
+<p>
+    @Html.ActionLink("Back To Kennel Details", "Details", "Kennels", new { id = @RatingsController.kenID }, null)
+</p>
 
 <table class="table">
     <tr>
@@ -22,7 +25,7 @@
         <th>
             @Html.DisplayNameFor(model => model.Ratings)
         </th>
-        <th class="col-md-3">
+        <th>
             @Html.DisplayNameFor(model => model.Comment)
         </th>
         <th>
@@ -39,7 +42,7 @@
         <td>
             @Html.DisplayFor(modelItem => item.Ratings)
         </td>
-        <td class="maxwidth">
+        <td>
             @Html.DisplayFor(modelItem => item.Comment)
         </td>
         <td>
@@ -49,4 +52,8 @@
     </tr>
 }
 
+    
 </table>
+
+
+
