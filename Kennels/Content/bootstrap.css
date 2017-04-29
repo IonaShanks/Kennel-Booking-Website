@@ -1,4 +1,4 @@
-﻿
+﻿@import url("https://fonts.googleapis.com/css?family=Ubuntu:400,700");
 /*!
  * bootswatch v3.3.7
  * Homepage: http://bootswatch.com
@@ -5632,8 +5632,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     }
 
 .navbar-inverse {
-    background-color: #20b5e9;
-    border-color: #20b5e9;
+    background-color: #772953;
+    border-color: #511c39;
 }
 
     .navbar-inverse .navbar-brand {
@@ -5689,7 +5689,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 
     .navbar-inverse .navbar-collapse,
     .navbar-inverse .navbar-form {
-        border-color: #20b5e9;
+        border-color: #5c2040;
     }
 
     .navbar-inverse .navbar-nav > .open > a,

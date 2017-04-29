@@ -5,13 +5,14 @@
     ViewBag.Title = "Details";
 }
 
-<h2>@Html.DisplayFor(model => model.Name)</h2>
+<h2 >@Html.DisplayFor(model => model.Name) @if (KennelsController.KennelOwner == false)
+{
+    <button class="btn btn-primary" style="float:right; margin-right:2em;" onclick="location.href='@Url.Action("Create", "Bookings", new { id = Model.KennelID}, null)';return false;">Book This Kennel</button>
+} </h2>
 
 <h4>
-    @if (KennelsController.KennelOwner == false)
-    {
-        <button class="btn btn-default" onclick="location.href='@Url.Action("Create", "Bookings", new { id = Model.KennelID}, null)';return false;">Book This Kennel</button>       
-    }
+    
+    
     @if (KennelsController.KennelOwner == true)
     {
             @Html.ActionLink("Update Kennel", "Edit", "Kennels", new { id = Model.KennelID }, null)        
@@ -23,7 +24,7 @@
 
     <hr />
     <div class="col-md-4">
-        <h4>@Html.DisplayNameFor(model => model.Address)</h4>
+        <h4 style="color:#20b5e9;">@Html.DisplayNameFor(model => model.Address)</h4>
         <div>
             <span>
                 @Html.DisplayFor(model => model.Address)
@@ -47,14 +48,19 @@
     
     <div class="col-md-4">
 
-        <h4>Customer Rating </h4>
+        <h4 style="color:#20b5e9;">Customer Rating </h4>
         <p>
-            @ViewBag.avgRating 
-            <br />
-             @Html.ActionLink(" See all ratings", "KennelRatings", "Ratings", new { id = Model.KennelID }, null)
+            @ViewBag.avgRating
+        </p>
+        <p>
+            @Html.ActionLink(" See all ratings", "KennelRatings", "Ratings", new { id = Model.KennelID }, null)
+        </p>
+        <p style="padding-top:1em;">
             @if (KennelsController.KennelOwner == false)
-            {<br />
-                @Html.ActionLink("Rate this kennel", "Create", "Ratings", new { id = Model.KennelID }, null)}
+            {
+                
+                <button class="btn btn-primary" onclick="location.href='@Url.Action("Create", "Ratings", new { id = Model.KennelID }, null)';return false;">Rate This Kennel</button>
+            }                
         </p>
     </div>
 
@@ -77,7 +83,7 @@
 
     </p>
     <hr style="clear: both;"/>
-    <div style="color: darkblue;">
+    <div>
         
         <h3>About @Html.DisplayFor(model => model.Name) </h3>
        
@@ -88,7 +94,7 @@
 
 
     <div class="col-md-12">
-        <h4>Kennel Description</h4>
+        <h4 style="color:#20b5e9;">Kennel Description</h4>
         <ul style="list-style: none;">
             <li style="padding-bottom:1em;">
                 @Html.DisplayFor(model => model.Description)
@@ -120,7 +126,7 @@
         </ul>
 
         <br />
-        <h4>Price and Policy</h4>
+        <h4 style="color:#20b5e9;">Price and Policy</h4>
         <ul>
             <li>
                 The price per night, per dog, is @Html.DisplayFor(model => model.PricePerNight).
@@ -133,7 +139,7 @@
             </li>
         </ul>
         <br />
-        <h4>Other Services</h4>
+        <h4 style="color:#20b5e9;">Other Services</h4>
         <ul>
             <li>
                 @Html.DisplayNameFor(model => model.Grooming)
@@ -145,7 +151,7 @@
             </li>
         </ul>
     </div>
-
+    <br style="clear:both;"/>
 </div>
 
 
