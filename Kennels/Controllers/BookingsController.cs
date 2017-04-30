@@ -18,6 +18,7 @@ namespace Kennels.Controllers
     {        
         private KennelsContext db = new KennelsContext();
         private UserManager<ApplicationUser> manager;
+        //KennelOwner for use in view
         public static bool KennelOwner = false;
         public BookingsController()
         {
@@ -25,6 +26,7 @@ namespace Kennels.Controllers
             manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));            
         }
         
+        //To send email confirmation 
         public void SendConfirmation(string Message, string Subject)
         {
             //Making email
@@ -57,13 +59,14 @@ namespace Kennels.Controllers
             var currentUser = manager.FindById(User.Identity.GetUserId());
             IQueryable<Booking> bookings = db.Booking.Where(b => b.User.Id == currentUser.Id);
             
-            //If the user type is Kennel Owner
+            //If the current user type is Kennel Owner
             if (currentUser.UserType == UserType.KennelOwner)
             {
                 KennelOwner = true;
                 var ken = db.Kennel.Where(k => k.User.Id == currentUser.Id);
                 if (ken.Count() > 0)
                 {
+                    //Makes a list of bookings for each of their kennels
                     var bookedList = new List<Booking>();                    
                     foreach (Kennel k in ken)
                     {     
@@ -73,6 +76,7 @@ namespace Kennels.Controllers
                         }
                     }
 
+                    //Displays the list of kennels
                     return View(bookedList);
                 }
                 else
@@ -84,7 +88,7 @@ namespace Kennels.Controllers
             //If the user type is Customer
             else if (currentUser.UserType == UserType.Customer)
             {              
-                //If the Current user has bookings it shows them a list of their bookings, if not it redirects the the create action. 
+                //If the Current user has bookings it shows them a list of their bookings, if not it displays a blank table with a message 
                 if (bookings.Count() > 0)
                 {
                     return View(db.Booking.Include(k => k.Kennel).ToList().Where(b => b.User == currentUser));
@@ -120,6 +124,8 @@ namespace Kennels.Controllers
             }
 
             bool kenOwn = false;
+
+            //Checks if the kennel owner owns the kennel for the booking
             if (currentUser.UserType == UserType.KennelOwner)
             {
                 var kk = db.Kennel.Where(k => k.KennelID == booking.KennelID).FirstOrDefault();
@@ -137,6 +143,7 @@ namespace Kennels.Controllers
         }
 
         // GET: Bookings/Create
+        //Only customers can create bookings
         public ActionResult Create(string id)
         {
             var currentUser = manager.FindById(User.Identity.GetUserId());
@@ -219,7 +226,6 @@ namespace Kennels.Controllers
                                 await db.SaveChangesAsync();
 
                                 //Updates the KennelAvailability to full if the kennel has reached capacity for that date. 
-
                                 if (ka.Availability == kennel.Capacity)
                                 {
                                     ka.Full = true;
@@ -247,7 +253,7 @@ namespace Kennels.Controllers
                             "<p>Thank you for booking with IS Kennels. </p> <p>Your booking is as follows: </p>" + bookingConf;
                         string Subject = "Booking Conformation for " + kennel.Name;
 
-                        //Sends the email
+                        //Calls the email funtion
                         SendConfirmation(Message, Subject);
 
                         TempData["Thank"] = "Thank you for your booking";
@@ -297,14 +303,17 @@ namespace Kennels.Controllers
                 return HttpNotFound();
             }
 
-            //Finds the number of hours between the start date and the date now. 
-            double canc = ((booking.StartDate - DateTime.Now).TotalDays)*24;
-
-            //Compares the difference in hours against the cancellation policy 
-            if (ken.CancellationPeriod >= canc)
+            //Customers can't cancel within the limit but kennel owners can
+            if (currentUser.UserType == UserType.Customer)
             {
-                TempData["tooSoon"] = "Booking cannot be cancelled as it is too close to the start date, please contact the kennel directly";
-                return RedirectToAction("Index");
+                //Finds the number of hours between the start date and the date now. 
+                double canc = ((booking.StartDate - DateTime.Now).TotalDays) * 24;
+                //Compares the difference in hours against the cancellation policy 
+                if (ken.CancellationPeriod >= canc)
+                {
+                    TempData["tooSoon"] = "Booking cannot be cancelled as it is too close to the start date, please contact the kennel directly";
+                    return RedirectToAction("Index");
+                }
             }
 
             if (currentUser.UserType == UserType.KennelOwner)
@@ -360,7 +369,7 @@ namespace Kennels.Controllers
                         "<p>Confirmation of the cancellation of the following booking: </p>" + bookingConf;
             string Subject = "Booking Cancellation for " + kennel.Name;
 
-            //Sends the email
+            //Calls the function to send the email
             SendConfirmation(Message, Subject);
 
             return RedirectToAction("Index");

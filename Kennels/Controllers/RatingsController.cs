@@ -35,17 +35,19 @@ namespace Kennels.Controllers
             if (currentUser.UserType == UserType.Customer)
             {
                 Customer = true;
-                //If the Current user has ratings it shows them a list of their ratings, if not it redirects the the create action. 
+                //If the Current user has ratings it shows them a list of their ratings
                 if (ratings.Count() > 0)
                 { return View(ratings); }
                 else
                 {
+                    //if no ratings displays blank list with message
                     ViewBag.NoRate = "No ratings to show.";
                     return View(ratings);
                 }
             }
             else
             {
+                //only customers can see their own ratings
                 TempData["Unauth"] = "You are not authorised to do that, must be logged in as a customer";
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
@@ -72,13 +74,14 @@ namespace Kennels.Controllers
                 }
             }
             kenID = id; 
-            //If the Current user has ratings it shows them a list of their ratings, if not it shows an empty list. 
+            //If the selected kennel has ratings it shows them a list of the ratings 
             if (ratings.Count() > 0)
             {                
                 return View(ratings);
             }
             else
             {
+                //if no ratings it shows an empty list with a message
                 ViewBag.NoRate = "No ratings to show.";
                 return View(ratings);
             }            
@@ -124,6 +127,7 @@ namespace Kennels.Controllers
                 return RedirectToAction("Edit", new { id = rateID.RatingID });
             }
 
+            //Only user type customer may make ratings
             if (currentUser.UserType == UserType.Customer)
             {             
                 Customer = true;
@@ -158,7 +162,6 @@ namespace Kennels.Controllers
                         TotalRatings = rating.Ratings,
                         TotalRaters = 1,
                         AverageRating = rating.Ratings
-
                     };
 
                     db.TotalRating.Add(newTRate);
@@ -207,6 +210,7 @@ namespace Kennels.Controllers
             {
                 return HttpNotFound();
             }
+            //only owner of the rating may edit it
             if (rating.User != currentUser)
             {
                 TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
@@ -246,8 +250,7 @@ namespace Kennels.Controllers
                 TempData["Thank"] = "Rating Updated";
                 return RedirectToAction("Index");
             }
-
-            ViewBag.KennelID = new SelectList(db.Kennel, "KennelID", "Name", rating.KennelID);
+            
             return View(rating);
         }
 
@@ -264,6 +267,7 @@ namespace Kennels.Controllers
             {
                 return HttpNotFound();
             }
+            //only owner of the rating may delete it
             if (rating.User != currentUser)
             {
                 TempData["Unauth"] = "You are not authorised to do that, log in as a different user";

@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net;
-using System.Web.Mvc;
-using Kennels.Models;
+﻿using Kennels.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace Kennels.Controllers
 {
-    
+
     [Authorize]
     public class KennelsController : Controller
     {
@@ -39,6 +39,7 @@ namespace Kennels.Controllers
             dateSearch = false;
             //To only show specific things to specific users in the view
             KennelOwner = false;
+
             var currentUser = manager.FindById(User.Identity.GetUserId());
             if (currentUser != null)
             {
@@ -108,19 +109,20 @@ namespace Kennels.Controllers
                             }
                         }
                     }
-                    //If the kennel is not full for any of the days it is added to the list
+                    //If the kennel is not full for any of the days
                     if (kenFull != true)
                     {     
+                        //Populates list
                         avList.Add(kennel);
                     }                    
-                }
+                }                
                 kennels = avList.AsQueryable();                    
             }
 
             
             //Search by rating
             if (!string.IsNullOrEmpty(searchRate))
-            {
+            {            
                 var rateList = new List<Kennel>();
                 //Adds kennels to the list depending on whether they are higher than or equal to the searched rating.
                 foreach (Kennel kennel in db.Kennel)
@@ -199,7 +201,8 @@ namespace Kennels.Controllers
 
             //If the user type is Kennel Owner
             if (currentUser.UserType == UserType.KennelOwner)
-            {                
+            {   
+                //If they have added a kennel
                 if (kennels.Count() > 0)
                 {   
                     //Makes a list of all the kennels belonging to the owner and displays them in the view                 
@@ -212,12 +215,14 @@ namespace Kennels.Controllers
                 }
                 else
                 {
+                    //Displays the empty list with a message
                     ViewBag.noKennel = "You have not added any kennels";
                     return View(kennels);
                 }
             }
             else
             {
+                //Redirects to the all kennel index if not a kennel owner
                 return Redirect("Index");
             }
         }
@@ -279,6 +284,7 @@ namespace Kennels.Controllers
         public ActionResult Create()
         {
             var currentUser = manager.FindById(User.Identity.GetUserId());
+            //Only type kennel owner is authorized to add kennels
             if (currentUser.UserType != UserType.KennelOwner)
             {
                 TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
@@ -320,6 +326,7 @@ namespace Kennels.Controllers
                 return HttpNotFound();
             }
 
+            //Only the kennel owner is authorized to edit the kennel
             if (kennels.User != currentUser)
             {
                 TempData["Unauth"] = "You are not authorised to do that, you do not own this kennel";
@@ -355,6 +362,8 @@ namespace Kennels.Controllers
             {
                 return HttpNotFound();
             }
+
+            //Only the kennel owner is authorized to delete the kennel
             if (kennels.User != currentUser)
             {                
                 TempData["Unauth"] = "You are not authorised to do that, log in as a different user";

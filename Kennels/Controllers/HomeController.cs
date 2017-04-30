@@ -21,7 +21,7 @@ namespace Kennels.Controllers
             return View();
         }
 
-
+        //Function to send email 
         public void ContactEmail(string Message, string Email, String Name)
         {
             //Making email            
@@ -61,9 +61,11 @@ namespace Kennels.Controllers
             {
                 try
                 {
+                    //Fills the function paramaters based on what the use inputs in the form
                     String Message = vm.Message;
                     String Email = vm.EmailFrom;
                     String Name = vm.Name;
+                    //Calls the function to send the email 
                     ContactEmail(Message, Email, Name);                 
                 }
                 catch (Exception ex)
@@ -77,7 +79,7 @@ namespace Kennels.Controllers
                 ModelState.AddModelError("", "ModelState not valid");
                 return View(vm);
             }
-            return View();
+            return View(vm);
         }
     }
 }
