@@ -94,12 +94,12 @@ namespace Kennels.Models
 
         [Required, Phone, Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
+
         [Required, Display(Name = "User Type")]
         public UserType UserType { get; set; }       
     }
 
 
-        
     public class ResetPasswordViewModel
     {
         [Required]

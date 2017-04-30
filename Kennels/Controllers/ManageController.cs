@@ -63,24 +63,28 @@ namespace Kennels.Controllers
                 : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
                 : "";
 
+            var Db = new KennelsContext();
+
             var userId = User.Identity.GetUserId();
-            var model = new IndexViewModel
+            var user = Db.Users.SingleOrDefault(u => u.Id == userId);
+
+            var model = new EditUserViewModel
             {
-                HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                Address = user.Address,
+                County = user.County,
+                Fname = user.Fname,
+                Lname = user.Lname,
+                PhoneNumber = user.PhoneNumber
             };
             return View(model);
         }
 
-        public ActionResult Edit(string id, ManageMessageId? message = null)
+        public ActionResult Edit()
         {
             var Db = new KennelsContext();
 
             var userId = User.Identity.GetUserId();
-            var user = Db.Users.SingleOrDefault(u => u.Email == userId);
+            var user = Db.Users.SingleOrDefault(u => u.Id == userId);
             var model = new EditUserViewModel(user);
             return View(model);
 
@@ -94,8 +98,9 @@ namespace Kennels.Controllers
             if (ModelState.IsValid)
             {
                 var Db = new KennelsContext();
-                var user = Db.Users.SingleOrDefault(u => u.Email == model.Email);
-                // Update the user data:
+                var userId = User.Identity.GetUserId();
+                var user = Db.Users.SingleOrDefault(u => u.Id == userId);
+                // Update the user data:                
                 user.Fname = model.Fname;
                 user.Lname = model.Lname;
                 user.Address = model.Address;
