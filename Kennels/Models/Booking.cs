@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace Kennels.Models
 {
@@ -48,25 +45,26 @@ namespace Kennels.Models
         public int BookingID { get; set; }
         [Required, DataType(DataType.Date), FutureDate(ErrorMessage = "Date cannot be in the past"), Display(Name ="From")]
         public DateTime StartDate { get; set; }
-        [Required, DataType(DataType.Date), DateAfter("StartDate")/*(ErrorMessage = "Stay must be at least one night")*/, Display(Name ="To")]        
+        [Required, DataType(DataType.Date), DateAfter("StartDate"), Display(Name ="To")]        
         public DateTime EndDate { get; set; }
         [Phone, Display(Name = "Contact Number")]
         public string PhoneNumber { get; set; }
-
-        //Calculates the total nights based on the start and end date entered by the user. 
+         
+        [Display(Name = "Total Nights")]
         public int TotalNights { get; set; }
 
+        //Calculates the total nights based on the start and end date entered by the user.
         public int CalcTotalNights(DateTime startDate, DateTime endDate)
         {
             int Tnights = (endDate - startDate).Days;
             return Tnights;
 
-        }        
+        }    
+        [Display(Name = "Total Price"), DisplayFormat(DataFormatString = "{0:C}")]
         public double Price { get; set; }
 
-        //Calculates the price by calculating how many nights remain after 7/14/21 etc (one week) and calculating the price per night
+        //Calculates the price by calculating how many nights remain after 7/14/21 days etc (one week) and calculating the price per night
         //and then calculating the number of weeks and calculating the price per week, and adding them together to get the total price.
-
         public double CalcTotalPrice(double pricePerNight, double pricePerWeek, int totalNights)
         {
             const int week = 7;            
@@ -79,5 +77,21 @@ namespace Kennels.Models
 
         public ApplicationUser User { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
+    }
+
+    public class BookingViewModel : Booking
+    {
+        //[Required, DataType(DataType.Date), FutureDate(ErrorMessage = "Date cannot be in the past"), Display(Name = "From")]
+        //public DateTime StartDate { get; set; }
+        //[Required, DataType(DataType.Date), DateAfter("StartDate"), Display(Name = "To")]
+        //public DateTime EndDate { get; set; }
+
+        //public double CalcTotalPrice(double pricePerNight, double pricePerWeek, int totalNights)
+        //{
+        //    const int week = 7;
+        //    double totalPrice = ((totalNights % week) * pricePerNight) + ((totalNights / week) * pricePerWeek);
+        //    return totalPrice;
+        //}
+
     }
 }

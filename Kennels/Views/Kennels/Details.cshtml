@@ -62,20 +62,8 @@
        <img src="http://brayton-primary.co.uk/attachments/Image/AwaitingImage_22.jpg?template=generic" alt="Awaiting Image" style="width:100%;height:100%;"/>
         
     </div>
-    <br style="clear: both;">
-   
-    <br />
-    <p>
-        @if (KennelsController.KennelOwner == false)
-        {
-            @Html.ActionLink("Back to All Kennels", "Index")
-        }
-        @if (KennelsController.KennelOwner == true)
-        {
-            @Html.ActionLink("Back to My Kennels", "MyKennels")
-        }
-
-    </p>
+    
+    
     <hr style="clear: both;"/>
     <div>
         
@@ -83,9 +71,6 @@
        
     </div>
     <hr style="clear: both;"/>
-
-
-
 
     <div class="col-md-12">
         <h4 style="color:#20b5e9;">Kennel Description</h4>
@@ -129,12 +114,15 @@
                 The price per week, per dog, is @Html.DisplayFor(model => model.PricePerWeek)
             </li>
             <li>
+                You may book your dog in for a maximum of @Html.DisplayFor(model => model.MaxDays)
+            </li>
+            <li>
                 You may cancel a booking up to @Html.DisplayFor(model => model.CancellationPeriod) hours before the booking date.
             </li>
         </ul>
         <br />
         <h4 style="color:#20b5e9;">Other Services</h4>
-        <ul>
+        <ul style="margin-bottom:3em;">
             <li>
                 @Html.DisplayNameFor(model => model.Grooming)
                 @Html.DisplayFor(model => model.Grooming)
@@ -145,7 +133,22 @@
             </li>
         </ul>
     </div>
-    <br style="clear:both;"/>
+    
+    <hr style="clear:both;"/>
+    
+
+    <p>
+        @if (KennelsController.KennelOwner == false)
+        {
+            @Html.ActionLink("Back to All Kennels", "Index")
+        }
+        @if (KennelsController.KennelOwner == true)
+        {
+            @Html.ActionLink("Back to My Kennels", "MyKennels")
+        }
+
+    </p>
+    
 </div>
 
 

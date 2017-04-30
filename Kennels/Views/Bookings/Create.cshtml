@@ -15,85 +15,51 @@
         <h4>@ViewBag.KennelName</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.BookingID)
                 
         <div class="form-group">
             @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.StartDate, new {htmlAttributes = new {placeholder = "dd/mm/yyyy", @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+                @Html.DisplayFor(model => model.StartDate, new {htmlAttributes = new {@class = "form-control" } })               
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10" @*onclick="display()"*@>
-                @Html.EditorFor(model => model.EndDate, new { htmlAttributes = new { placeholder = "dd/mm/yyyy", @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.EndDate, new { htmlAttributes = new { @class = "form-control" } })
+               
             </div>
         </div>
 
-        BUTTON DOESN'T CALL POST METHOD
-        <button onclick="location.href='@Url.Action("Index", "Users")';return false;">Cancel</button>
 
-        @*<div class="form-group">
+        <div class="form-group">
             @Html.LabelFor(model => model.TotalNights, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.TotalNights, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.DisplayFor(model => model.TotalNights, new { htmlAttributes = new { @class = "form-control" } })
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.DisplayFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
             </div>
-        </div>*@
+        </div>
 
 
 
         <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-success" />
+            <div class="form-actions no-color, col-md-offset-1">
+                <input type="submit" value="Create" class="btn btn-success" style="margin-right: 2em;"/> 
+                <button class="btn btn-danger" onclick="location.href='@Url.Action("CreateViewModel", "Bookings", new { id = Model.KennelID }, null)';return false;">Cancel</button>
             </div>
+            
         </div>
     </div>
 
     }
 
-<div>
-    @Html.ActionLink("Back to Bookings", "Index")
-</div>
-
-<script>
-    function display(){
-    CalcTotalNights;
-    }
-    </script>
-@*<script>
-function formatCurrency(value) {
-    return "$" + value.toFixed(2);
-}
-
-var CartLine = function() {
-    var self = this;
-    self.category = ko.observable();
-    self.product = ko.observable();
-    self.quantity = ko.observable(1);
-    self.subtotal = ko.pureComputed(function() {
-        return self.product() ? self.product().price * parseInt("0" + self.quantity(), 10) : 0;
-    });
-
-    // Whenever the category changes, reset the product selection
-    self.category.subscribe(function() {
-        self.product(undefined);
-    });
-};
-
-</script>*@
-
-@*<script type="text/javascript">
-    $(document).ready(funtion(){$(    });
-</script>*@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

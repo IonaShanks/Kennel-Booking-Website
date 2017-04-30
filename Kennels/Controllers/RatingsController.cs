@@ -1,17 +1,17 @@
-﻿using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net;
-using System.Web.Mvc;
-using Kennels.Models;
+﻿using Kennels.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace Kennels.Controllers
 {
-    
+
     [Authorize]
     public class RatingsController : Controller
     {

@@ -94,23 +94,32 @@ namespace Kennels.Controllers
                 //Loops through every kennel in the kennel database
                 foreach (Kennel kennel in db.Kennel)
                 {
-                    //Bool to keep track if a kennel is full or not
-                    bool kenFull = false;
-                    for (DateTime date = ss; date <= se; date = date.AddDays(1))
+                    //Bool to keep track if a kennel is available or not
+                    bool kenAvail = false;
+                    //If the search exceeds the maximum days
+                    if ((se - ss).Days > kennel.MaxDays)
                     {
-                        var ka = db.KennelAvailability.Where(k => k.KennelID == kennel.KennelID && k.BookingDate == date).FirstOrDefault();
-                        //Could be null if the kennel hasn't been booked at all on the day
-                        if (ka != null)
-                        {                            
-                            //Triggers true if the kennel is full for part of or all of the search dates
-                            if (ka.Full == true)
+                        kenAvail = true;
+                    }
+                    //If the search doesn't exceed maximum days
+                    else
+                    {
+                        for (DateTime date = ss; date <= se; date = date.AddDays(1))
+                        {
+                            var ka = db.KennelAvailability.Where(k => k.KennelID == kennel.KennelID && k.BookingDate == date).FirstOrDefault();
+                            //Could be null if the kennel hasn't been booked at all on the day
+                            if (ka != null)
                             {
-                                kenFull = true;
+                                //Triggers true if the kennel is full for part of or all of the search dates
+                                if (ka.Full == true)
+                                {
+                                    kenAvail = true;
+                                }
                             }
                         }
                     }
                     //If the kennel is not full for any of the days
-                    if (kenFull != true)
+                    if (kenAvail != true)
                     {     
                         //Populates list
                         avList.Add(kennel);
