@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -18,6 +19,15 @@ namespace Kennels.Controllers
     {
         public static bool KennelOwner = false;
         public static IQueryable<TotalRating> rate;
+        public static TextInfo myTI = new CultureInfo("en-IE", false).TextInfo;
+                
+        public static string TitleCase(string q)
+        {
+            q = myTI.ToTitleCase(q);
+                return q;
+        }
+
+
 
         private KennelsContext db = new KennelsContext();
         private UserManager<ApplicationUser> manager;
@@ -38,8 +48,7 @@ namespace Kennels.Controllers
         {
             dateSearch = false;
             //To only show specific things to specific users in the view
-            KennelOwner = false;
-
+            KennelOwner = false;            
             var currentUser = manager.FindById(User.Identity.GetUserId());
             if (currentUser != null)
             {
@@ -79,6 +88,34 @@ namespace Kennels.Controllers
             //Search by date
             if (searchStart.HasValue && searchEnd.HasValue)
             {
+                var rateSearchList = new List<Kennel>();
+                if (!string.IsNullOrEmpty(searchRate))
+                {
+                    foreach (Kennel ken in db.Kennel)
+                    {
+                        var rateqry = db.TotalRating.Where(r => r.KennelID == ken.KennelID).FirstOrDefault();
+                        int search = Convert.ToInt32(searchRate);
+                        if (rateqry == null)
+                        {
+                            rateSearchList.Add(ken);
+                        }
+                        if (rateqry != null)
+                        {
+                            if (rateqry.AverageRating >= search)
+                            {
+                                rateSearchList.Add(ken);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (Kennel k in db.Kennel)
+                    {
+                        rateSearchList.Add(k);
+                    }
+                }
+
                 dateSearch = true;
                 //Converts the variables from DateTime? to DateTime 
                 DateTime ss = Convert.ToDateTime(searchStart);
@@ -92,7 +129,7 @@ namespace Kennels.Controllers
                      
                 
                 //Loops through every kennel in the kennel database
-                foreach (Kennel kennel in db.Kennel)
+                foreach (Kennel kennel in rateSearchList)
                 {
                     //Bool to keep track if a kennel is available or not
                     bool kenAvail = false;
@@ -117,21 +154,23 @@ namespace Kennels.Controllers
                                 }
                             }
                         }
+
                     }
                     //If the kennel is not full for any of the days
                     if (kenAvail != true)
                     {     
                         //Populates list
                         avList.Add(kennel);
-                    }                    
+                    }
+                    
                 }                
                 kennels = avList.AsQueryable();                    
             }
 
-            
+
             //Search by rating
-            if (!string.IsNullOrEmpty(searchRate))
-            {            
+            if (!string.IsNullOrEmpty(searchRate) && !searchStart.HasValue && !searchEnd.HasValue)
+            {
                 var rateList = new List<Kennel>();
                 //Adds kennels to the list depending on whether they are higher than or equal to the searched rating.
                 foreach (Kennel kennel in db.Kennel)
@@ -150,8 +189,10 @@ namespace Kennels.Controllers
                         }
                     }
                 }
+
                 kennels = rateList.AsQueryable();
             }
+
 
             //Sort results
             if (!string.IsNullOrEmpty(sort))
@@ -313,6 +354,10 @@ namespace Kennels.Controllers
             if (ModelState.IsValid)
             {
                 kennels.User = currentUser;
+                kennels.KennelID = kennels.KennelID.ToUpper();
+                kennels.Name = TitleCase(kennels.Name);
+                kennels.Address = TitleCase(kennels.Address);
+                kennels.Town = TitleCase(kennels.Town);
                 db.Kennel.Add(kennels);
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
@@ -351,6 +396,9 @@ namespace Kennels.Controllers
         {
             if (ModelState.IsValid)
             {
+                kennels.Name = TitleCase(kennels.Name);
+                kennels.Address = TitleCase(kennels.Address);
+                kennels.Town = TitleCase(kennels.Town);
                 db.Entry(kennels).State = EntityState.Modified;
                 await db.SaveChangesAsync();
                 return RedirectToAction("MyKennels");

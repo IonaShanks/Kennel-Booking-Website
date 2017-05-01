@@ -1,15 +1,15 @@
-﻿using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net;
-using System.Web.Mvc;
-using Kennels.Models;
+﻿using Kennels.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
 using System.Net.Mail;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace Kennels.Controllers
 {
@@ -166,7 +166,7 @@ namespace Kennels.Controllers
         private bool full;
         [HttpPost]
         public ActionResult CreateViewModel(string id, BookingViewModel bm)
-        {
+        {           
             
             var currentUser = manager.FindById(User.Identity.GetUserId());
 

@@ -27,7 +27,7 @@ namespace Kennels.Models
             DateTime endDate = (DateTime)value;
             DateTime startDate = (DateTime)validationContext.ObjectType.GetProperty(DateToCompare).GetValue(validationContext.ObjectInstance, null);
 
-            if (startDate > endDate)
+            if (startDate >= endDate)
             {
                 return new ValidationResult("Stay must be at least one night");                
             }
