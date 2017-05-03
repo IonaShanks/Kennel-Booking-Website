@@ -20,11 +20,11 @@ namespace Kennels.Controllers
         public static bool KennelOwner = false;
         public static IQueryable<TotalRating> rate;
         public static TextInfo myTI = new CultureInfo("en-IE", false).TextInfo;
-                
+
         public static string TitleCase(string q)
         {
             q = myTI.ToTitleCase(q);
-                return q;
+            return q;
         }
 
 
@@ -40,7 +40,7 @@ namespace Kennels.Controllers
         //For use in view
         public static DateTime searchSt;
         public static DateTime searchEn;
-        public static bool dateSearch = false;  
+        public static bool dateSearch = false;
 
         // GET: Kennels
         [AllowAnonymous]
@@ -48,7 +48,7 @@ namespace Kennels.Controllers
         {
             dateSearch = false;
             //To only show specific things to specific users in the view
-            KennelOwner = false;            
+            KennelOwner = false;
             var currentUser = manager.FindById(User.Identity.GetUserId());
             if (currentUser != null)
             {
@@ -60,7 +60,7 @@ namespace Kennels.Controllers
 
             //Creates a list of distinct countys that have kennels in them.
             var CountyList = new List<string>();
-            var CountyQry = db.Kennel.Select(c => c.County.ToString());            
+            var CountyQry = db.Kennel.Select(c => c.County.ToString());
             CountyList.AddRange(CountyQry.Distinct());
             ViewBag.county = new SelectList(CountyList);
 
@@ -78,29 +78,35 @@ namespace Kennels.Controllers
             SortList.Add("Name (Z-A)");
             SortList.Add("Price per Night (H-L)");
             SortList.Add("Price per Night (L-H)");
-            SortList.Add("Price per Week (H-L)");            
+            SortList.Add("Price per Week (H-L)");
             SortList.Add("Price per Week (L-H)");
             ViewBag.sort = new SelectList(SortList);
-                        
+
             IQueryable<Kennel> kennels = db.Kennel.Include(k => k.TotalRating);
-                        
-            
+
+
             //Search by date
             if (searchStart.HasValue && searchEnd.HasValue)
             {
+
                 var rateSearchList = new List<Kennel>();
+                //So that rating doesn't override date it is included
                 if (!string.IsNullOrEmpty(searchRate))
                 {
+                    //Loops through every kennel in the kennel database
                     foreach (Kennel ken in db.Kennel)
                     {
                         var rateqry = db.TotalRating.Where(r => r.KennelID == ken.KennelID).FirstOrDefault();
                         int search = Convert.ToInt32(searchRate);
+
+                        //Adds to list is kennel not yet rated
                         if (rateqry == null)
                         {
                             rateSearchList.Add(ken);
                         }
                         if (rateqry != null)
                         {
+                            //Adds to list if kennel rating >= search rating
                             if (rateqry.AverageRating >= search)
                             {
                                 rateSearchList.Add(ken);
@@ -110,86 +116,97 @@ namespace Kennels.Controllers
                 }
                 else
                 {
+                    //Loops through every kennel in the kennel database
                     foreach (Kennel k in db.Kennel)
                     {
                         rateSearchList.Add(k);
                     }
                 }
 
-                dateSearch = true;
-                //Converts the variables from DateTime? to DateTime 
-                DateTime ss = Convert.ToDateTime(searchStart);
-                DateTime se = Convert.ToDateTime(searchEnd);
-
-                searchSt = ss;
-                searchEn = se;
-
-                //Creates a list of the kennels to be displayed
-                var avList = new List<Kennel>();
-                     
-                
-                //Loops through every kennel in the kennel database
-                foreach (Kennel kennel in rateSearchList)
+                //Checks the start date is before the end date
+                if (searchEn < searchSt)
                 {
-                    //Bool to keep track if a kennel is available or not
-                    bool kenAvail = false;
-                    //If the search exceeds the maximum days
-                    if ((se - ss).Days > kennel.MaxDays)
+
+                    dateSearch = true;
+
+                    //Converts the variables from DateTime? to DateTime 
+                    DateTime ss = Convert.ToDateTime(searchStart);
+                    DateTime se = Convert.ToDateTime(searchEnd);
+
+                    searchSt = ss;
+                    searchEn = se;
+
+                    //Creates a list of the kennels to be displayed
+                    var avList = new List<Kennel>();
+
+                    //Loops through every kennel in the kennel database
+                    foreach (Kennel kennel in rateSearchList)
                     {
-                        kenAvail = true;
-                    }
-                    //If the search doesn't exceed maximum days
-                    else
-                    {
-                        for (DateTime date = ss; date <= se; date = date.AddDays(1))
+                        //Bool to keep track if a kennel is available or not
+                        bool kenAvail = false;
+                        //If the search exceeds the maximum days
+                        if ((se - ss).Days > kennel.MaxDays)
                         {
-                            var ka = db.KennelAvailability.Where(k => k.KennelID == kennel.KennelID && k.BookingDate == date).FirstOrDefault();
-                            //Could be null if the kennel hasn't been booked at all on the day
-                            if (ka != null)
+                            kenAvail = true;
+                        }
+                        //If the search doesn't exceed maximum days
+                        else
+                        {
+                            for (DateTime date = ss; date <= se; date = date.AddDays(1))
                             {
-                                //Triggers true if the kennel is full for part of or all of the search dates
-                                if (ka.Full == true)
+                                var ka = db.KennelAvailability.Where(k => k.KennelID == kennel.KennelID && k.BookingDate == date).FirstOrDefault();
+                                //Could be null if the kennel hasn't been booked at all on the day
+                                if (ka != null)
                                 {
-                                    kenAvail = true;
+                                    //Triggers true if the kennel is full for part of or all of the search dates
+                                    if (ka.Full == true)
+                                    {
+                                        kenAvail = true;
+                                    }
                                 }
                             }
+
+                        }
+                        //If the kennel is not full for any of the days
+                        if (kenAvail != true)
+                        {
+                            //Populates list
+                            avList.Add(kennel);
                         }
 
                     }
-                    //If the kennel is not full for any of the days
-                    if (kenAvail != true)
-                    {     
-                        //Populates list
-                        avList.Add(kennel);
-                    }
-                    
-                }                
-                kennels = avList.AsQueryable();                    
+                    kennels = avList.AsQueryable();
+                }
+                else
+                {
+                    kennels = rateSearchList.AsQueryable();
+                    ViewBag.Invalid = "Invalid dates, start date must be before end date!";
+                }
             }
 
 
-            //Search by rating
+            //Search by rating if search dates are not entered (overrides if entered)
             if (!string.IsNullOrEmpty(searchRate) && !searchStart.HasValue && !searchEnd.HasValue)
             {
                 var rateList = new List<Kennel>();
-                //Adds kennels to the list depending on whether they are higher than or equal to the searched rating.
                 foreach (Kennel kennel in db.Kennel)
                 {
                     var rateqry = db.TotalRating.Where(r => r.KennelID == kennel.KennelID).FirstOrDefault();
                     int search = Convert.ToInt32(searchRate);
+                    //If null means it hasn't been rated so shows at all star ratings
                     if (rateqry == null)
                     {
                         rateList.Add(kennel);
                     }
                     if (rateqry != null)
                     {
+                        //Adds the kennels with a rating >= the rating input in the search paramaters
                         if (rateqry.AverageRating >= search)
                         {
                             rateList.Add(kennel);
                         }
                     }
                 }
-
                 kennels = rateList.AsQueryable();
             }
 
@@ -228,7 +245,7 @@ namespace Kennels.Controllers
             if (!string.IsNullOrEmpty(searchName))
             {
                 //Adds the kennels to the list that include the name searched
-                kennels = kennels.Where(n => n.Name.Contains(searchName));              
+                kennels = kennels.Where(n => n.Name.Contains(searchName));
             }
 
             //Search by county
@@ -238,8 +255,8 @@ namespace Kennels.Controllers
                 kennels = kennels.Where(c => c.County.ToString() == county);
             }
 
-            
-            rate = db.TotalRating; 
+
+            rate = db.TotalRating;
             //Displays the view from all the queries
             return View(kennels);
         }
@@ -251,10 +268,10 @@ namespace Kennels.Controllers
 
             //If the user type is Kennel Owner
             if (currentUser.UserType == UserType.KennelOwner)
-            {   
+            {
                 //If they have added a kennel
                 if (kennels.Count() > 0)
-                {   
+                {
                     //Makes a list of all the kennels belonging to the owner and displays them in the view                 
                     var kenList = new List<Kennel>();
                     foreach (Kennel k in kennels)
@@ -328,7 +345,7 @@ namespace Kennels.Controllers
 
             return View(kennels);
         }
-        
+
 
         // GET: Kennels/Create
         public ActionResult Create()
@@ -354,10 +371,14 @@ namespace Kennels.Controllers
             if (ModelState.IsValid)
             {
                 kennels.User = currentUser;
+
+                //Capitalises in title case when added to the database
                 kennels.KennelID = kennels.KennelID.ToUpper();
                 kennels.Name = TitleCase(kennels.Name);
                 kennels.Address = TitleCase(kennels.Address);
                 kennels.Town = TitleCase(kennels.Town);
+
+                //Adds the kennel to the database
                 db.Kennel.Add(kennels);
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
@@ -396,9 +417,12 @@ namespace Kennels.Controllers
         {
             if (ModelState.IsValid)
             {
+                //Capitalises to title case when updated
                 kennels.Name = TitleCase(kennels.Name);
                 kennels.Address = TitleCase(kennels.Address);
                 kennels.Town = TitleCase(kennels.Town);
+
+                //Updates the database entry
                 db.Entry(kennels).State = EntityState.Modified;
                 await db.SaveChangesAsync();
                 return RedirectToAction("MyKennels");
@@ -422,7 +446,7 @@ namespace Kennels.Controllers
 
             //Only the kennel owner is authorized to delete the kennel
             if (kennels.User != currentUser)
-            {                
+            {
                 TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
