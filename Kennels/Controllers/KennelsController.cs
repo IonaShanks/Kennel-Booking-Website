@@ -124,10 +124,11 @@ namespace Kennels.Controllers
                 }
 
                 //Checks the start date is before the end date
-                if (searchEn < searchSt)
+                if (searchEnd > searchStart)
                 {
 
                     dateSearch = true;
+                    //DateTime dt = DateTime.ParseExact(searchStart.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
                     //Converts the variables from DateTime? to DateTime 
                     DateTime ss = Convert.ToDateTime(searchStart);
@@ -145,7 +146,7 @@ namespace Kennels.Controllers
                         //Bool to keep track if a kennel is available or not
                         bool kenAvail = false;
                         //If the search exceeds the maximum days
-                        if ((se - ss).Days > kennel.MaxDays)
+                        if ((se - ss).Days >= kennel.MaxDays)
                         {
                             kenAvail = true;
                         }
@@ -175,6 +176,14 @@ namespace Kennels.Controllers
                         }
 
                     }
+
+                    BookingViewModel sd = new BookingViewModel
+                    {
+                        StartDate = ss,
+                        EndDate = se
+                    };
+
+                    TempData["searchDates"] = sd;
                     kennels = avList.AsQueryable();
                 }
                 else
@@ -297,7 +306,10 @@ namespace Kennels.Controllers
         [AllowAnonymous]
         // GET: Kennels/Details/{KennelID}
         public async Task<ActionResult> Details(string id)
-        {
+        {            
+            Booking sd = TempData["searchDates"] as Booking;
+            TempData["searchDates"] = sd;
+
             KennelOwner = false;
             var currentUser = manager.FindById(User.Identity.GetUserId());
             if (currentUser != null)

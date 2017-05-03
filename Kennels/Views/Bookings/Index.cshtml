@@ -26,6 +26,10 @@
                 @Html.DisplayNameFor(model => model.PhoneNumber)
             </th>
         }
+
+        <th>
+            @Html.DisplayNameFor(model => model.PetsName)
+        </th>
         <th>
             @Html.DisplayNameFor(model => model.StartDate)
         </th>
@@ -54,6 +58,9 @@
                     @Html.DisplayFor(modelItem => item.PhoneNumber)
                 </th>
             }
+            <td>
+                @Html.DisplayFor(modelItem => item.PetsName)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.StartDate)
             </td>

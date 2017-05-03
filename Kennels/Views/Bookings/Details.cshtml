@@ -1,4 +1,5 @@
 ﻿@model Kennels.Models.Booking
+@using Kennels.Controllers
 
 @{
     ViewBag.Title = "Details";
@@ -10,7 +11,21 @@
     <h4>@Html.DisplayFor(model => model.Kennel.Name)</h4>
     <hr />
     <dl class="dl-horizontal">
-      
+      @if (BookingsController.KennelOwner == true)
+      {
+        <dt>
+            @Html.DisplayNameFor(model => model.PhoneNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PhoneNumber)
+        </dd>
+      }
+        <dt>
+            @Html.DisplayNameFor(model => model.PetsName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PetsName)
+        </dd>
         <dt>
             @Html.DisplayNameFor(model => model.StartDate)
         </dt>

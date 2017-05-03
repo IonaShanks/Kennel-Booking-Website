@@ -21,6 +21,7 @@ namespace Kennels.Controllers
        
         //KennelOwner for use in view
         public static bool KennelOwner = false;
+        
         public BookingsController()
         {
             db = new KennelsContext();
@@ -149,7 +150,7 @@ namespace Kennels.Controllers
         public ActionResult CreateViewModel(string id)
         {
             var currentUser = manager.FindById(User.Identity.GetUserId());
-            var kID = db.Kennel.Where(k => k.KennelID == id).First();
+            var kID = db.Kennel.Where(k => k.KennelID == id).FirstOrDefault();
 
             if (id == null)
             {
@@ -161,7 +162,15 @@ namespace Kennels.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
             ViewBag.KennelName = kID.Name;
-            return View();            
+            Booking bookingDates = TempData["searchDates"] as Booking;            
+            if(TempData["searchDates"] != null)
+            { 
+                return View(bookingDates);
+            }
+            else
+            {
+                return View();
+            }
         }
         private bool full;
         [HttpPost]
@@ -196,7 +205,8 @@ namespace Kennels.Controllers
                         var booking = new BookingViewModel
                         {
                             StartDate = bm.StartDate,
-                            EndDate = bm.EndDate
+                            EndDate = bm.EndDate,
+                            PetsName = bm.PetsName
                         };
                         TempData["booking"] = bm;
                         return RedirectToAction("Create", new { id = id });
@@ -253,6 +263,7 @@ namespace Kennels.Controllers
                 KennelID = id,
                 StartDate = createBooking.StartDate,
                 EndDate = createBooking.EndDate,
+                PetsName = createBooking.PetsName,
                 User = currentUser,
                 TotalNights = tNight,
                 Price = createBooking.CalcTotalPrice(kID.PricePerNight, kID.PricePerWeek, tNight)
@@ -276,7 +287,7 @@ namespace Kennels.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<ActionResult> Create(string id, [Bind(Include = "BookingID,StartDate,EndDate,PhoneNumber,TotalNights,Price,KennelID")] Booking booking)
+        public async Task<ActionResult> Create(string id, [Bind(Include = "BookingID,StartDate,EndDate,PhoneNumber,PetsName,TotalNights,Price,KennelID")] Booking booking)
         {
             var kennel = db.Kennel.Where(k => k.KennelID.ToUpper() == id.ToUpper()).First();
             var currentUser = manager.FindById(User.Identity.GetUserId());
@@ -335,7 +346,7 @@ namespace Kennels.Controllers
             await db.SaveChangesAsync();
 
             //Body of the email
-            string bookingConf = "<p> Kennel Name: " + kennel.Name + "</p><p> Date from: " + booking.StartDate.ToString().Substring(0, 10) +
+            string bookingConf = "<p> Kennel Name: " + kennel.Name + "</p><p>For pet: " + booking.PetsName + "</p><p> Date from: " + booking.StartDate.ToString().Substring(0, 10) +
                 "</p><p> Date to: " + booking.EndDate.Date.ToString().Substring(0, 10) + "</p><p> Total price: " + booking.Price;
             string Message = "<p>Hi " + currentUser.Fname + " " + currentUser.Lname + "</p>" +
                 "<p>Thank you for booking with IS Kennels. </p> <p>Your booking is as follows: </p>" + bookingConf;
@@ -434,10 +445,8 @@ namespace Kennels.Controllers
                 }
             }
                         
-            db.Booking.Remove(booking);
-            await db.SaveChangesAsync();
-
-            string bookingConf = "<p> Kennel Name: " + kennel.Name + "</p><p> Date from: " + booking.StartDate.ToString().Substring(0, 10) +
+            
+            string bookingConf = "<p> Kennel Name: " + kennel.Name + "</p><p>For pet: " + booking.PetsName + "</p><p> Date from: " + booking.StartDate.ToString().Substring(0, 10) +
                         "</p><p> Date to: " + booking.EndDate.Date.ToString().Substring(0, 10) + "</p><p> Total price: " + booking.Price;
             string Message = "<p>Hi " + currentUser.Fname + " " + currentUser.Lname + "</p>" +
                         "<p>Confirmation of the cancellation of the following booking: </p>" + bookingConf;
@@ -445,6 +454,9 @@ namespace Kennels.Controllers
 
             //Calls the function to send the email
             SendConfirmation(Message, Subject);
+
+            db.Booking.Remove(booking);
+            await db.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }

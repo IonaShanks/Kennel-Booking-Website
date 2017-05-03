@@ -49,6 +49,9 @@ namespace Kennels.Models
         public DateTime EndDate { get; set; }
         [Phone, Display(Name = "Contact Number")]
         public string PhoneNumber { get; set; }
+
+        [Display(Name ="Pets Name")]
+        public string PetsName { get; set; }
          
         [Display(Name = "Total Nights")]
         public int TotalNights { get; set; }
