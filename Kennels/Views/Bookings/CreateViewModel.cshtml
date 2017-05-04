@@ -25,7 +25,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { placeholder = "dd/mm/yyyy", @class = "form-control", type = "date" } })
+                @Html.TextBoxFor(model => model.StartDate, "{0:dd/MM/yyyy}", htmlAttributes: new { id = "from", @class = "form-control" } )
                 @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -33,14 +33,14 @@
         <div class="form-group">
             @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.EndDate, new { htmlAttributes = new { placeholder = "dd/mm/yyyy", @class = "form-control" } })
+                @Html.TextBoxFor(model => model.EndDate, "{0:dd/MM/yyyy}", htmlAttributes: new { id = "to", @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Next" class="btn btn-success" />
+                <input type="submit" value="Next" class="btn btn-primary" />
             </div>
         </div>
     </div>
@@ -51,25 +51,22 @@
     @Html.ActionLink("Back to Bookings", "Index")
 </div>
 
-<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
-<script src="//cdn.jsdelivr.net/webshim/1.14.5/polyfiller.js"></script>
+@Scripts.Render("~/bundles/jqueryui")
 <script>
-webshims.setOptions('forms-ext', {types: 'date'});
-webshims.polyfill('forms forms-ext');
-$.webshims.formcfg = {
-en: {
-    dFormat: '/',
-    dateSigns: '/',
-    patterns: {
-        d: "dd/mm/yy"
-    }
-}
-};
+
+    $("#to").datepicker({
+        dateFormat: "dd/mm/yy"
+    });
+    $("#from").datepicker({
+        dateFormat: "dd/mm/yy"
+    });
+   
 </script>
 
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
 
+@section Scripts {
+@Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/bundles/jqueryui")
 }
 

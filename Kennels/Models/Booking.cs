@@ -42,10 +42,10 @@ namespace Kennels.Models
     public class Booking
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int BookingID { get; set; }
-        [Required, DataType(DataType.Date), FutureDate(ErrorMessage = "Date cannot be in the past"), Display(Name ="From")]
+        public int BookingID { get; set; }        
+        [Required, DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}"), FutureDate(ErrorMessage = "Date cannot be in the past"), Display(Name ="From")]
         public DateTime StartDate { get; set; }
-        [Required, DataType(DataType.Date), DateAfter("StartDate"), Display(Name ="To")]        
+        [Required, DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}"), DateAfter("StartDate"), Display(Name ="To")]        
         public DateTime EndDate { get; set; }
         [Phone, Display(Name = "Contact Number")]
         public string PhoneNumber { get; set; }

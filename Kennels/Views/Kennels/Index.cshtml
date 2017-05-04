@@ -46,14 +46,14 @@
             <div class="form-group, col-md-4">
                 <br />
                 <label class="control-label" for="inputDefault">Start Date: </label>
-                @Html.TextBox("searchStart", "", new { type = "date", @class = "form-control", placeholder = "dd/mm/yyyy" })
+                @Html.TextBox("searchStart", "", new { id = "from", @class = "form-control" })
             </div>
 
             <div class="form-group, col-md-4">
                 <br />                
                 <label class="control-label" for="inputDefault">End Date: </label>
                 <br />
-                @Html.TextBox("searchEnd", "", new { type = "date", @class = "form-control", placeholder = "dd/mm/yyyy" })
+                @Html.TextBox("searchEnd", "", new { id = "to", @class = "form-control" })
             </div>
 
             <div class="form-group, col-md-4">
@@ -189,18 +189,14 @@
 </div>
 
 
-<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
-<script src="//cdn.jsdelivr.net/webshim/1.14.5/polyfiller.js"></script>
-<script>
-webshims.setOptions('forms-ext', {types: 'date'});
-webshims.polyfill('forms forms-ext');
-$.webshims.formcfg = {
-en: {
-    dFormat: '/',
-    dateSigns: '/',
-    patterns: {
-        d: "dd/mm/yy"
-    }
-}
-};
+@Scripts.Render("~/bundles/jqueryui")
+<script>    
+    $("#to").datepicker({
+        dateFormat: "dd/mm/yy"       
+    });
+    $("#from").datepicker({
+        dateFormat: "dd/mm/yy"
+    });
 </script>
+
+
