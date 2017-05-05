@@ -50,7 +50,7 @@ namespace Kennels.Models
         [Phone, Display(Name = "Contact Number")]
         public string PhoneNumber { get; set; }
 
-        [Display(Name ="Pets Name")]
+        [Required, Display(Name ="Pets Name")]
         public string PetsName { get; set; }
          
         [Display(Name = "Total Nights")]
