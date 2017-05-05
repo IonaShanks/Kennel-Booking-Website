@@ -29,7 +29,7 @@ namespace Kennels.Models
         [Required, Phone, Display(Name = "Phone Number")]
         public String PhoneNumber { get; set; }
 
-        [EmailAddress, Display(Name= "Email")]
+        [Required, EmailAddress, Display(Name= "Email")]
         public String Email { get; set; }
 
         [Required, Range(1, Int32.MaxValue, ErrorMessage = "{0} must be greater than 0.")]
