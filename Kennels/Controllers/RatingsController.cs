@@ -25,19 +25,48 @@ namespace Kennels.Controllers
             db = new KennelsContext();
             manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
         }
+
+
+        public ApplicationUser getUser()
+        {
+            var currentUser = manager.FindById(User.Identity.GetUserId());
+            return currentUser;
+        }
+
+        public void isCustomer()
+        {
+            var currentUser = getUser();
+            if (currentUser != null)
+            {
+                if (currentUser.UserType == UserType.KennelOwner)
+                {
+                    Customer = true;
+                }
+                else
+                {
+                    Customer = false;
+                }
+            }
+            else
+            {
+                Customer = false;
+            }
+        }
+
         // GET: Ratings (user specific)       
         public ActionResult Index()
         {
-            Customer = false;
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            isCustomer();
+            var currentUser = getUser();
             IQueryable<Rating> ratings = db.Rating.Include(k => k.Kennel).Where(b => b.User.Id == currentUser.Id);
 
-            if (currentUser.UserType == UserType.Customer)
-            {
-                Customer = true;
+            if (Customer == true)
+            {                
                 //If the Current user has ratings it shows them a list of their ratings
                 if (ratings.Count() > 0)
-                { return View(ratings); }
+                {
+                    return View(ratings);
+                }
                 else
                 {
                     //if no ratings displays blank list with message
@@ -62,17 +91,11 @@ namespace Kennels.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            var currentUser = getUser();
             IQueryable<Rating> ratings = db.Rating.Include(r => r.Kennel).Where(b => b.KennelID == id);
 
-            Customer = false;
-            if (currentUser != null)
-            {
-                if (currentUser.UserType == UserType.Customer)
-                {
-                    Customer = true;
-                }
-            }
+            isCustomer();
+
             kenID = id; 
             //If the selected kennel has ratings it shows them a list of the ratings 
             if (ratings.Count() > 0)
@@ -91,7 +114,7 @@ namespace Kennels.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> Details(int? id)
         {
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            //var currentUser = manager.FindById(User.Identity.GetUserId());
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -106,13 +129,13 @@ namespace Kennels.Controllers
         }
 
         // GET: Ratings/Create
-        public ActionResult Create(string id)
+        public ActionResult Create(string id, ApplicationUser user)
         {
-            Customer = false;
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            isCustomer();
+            var currentUser = getUser();
+            user = currentUser;
             bool ratingExists = db.Rating.Where(r => r.KennelID == id && r.User.Id == currentUser.Id).Count() > 0;
-
-
+            
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -128,9 +151,8 @@ namespace Kennels.Controllers
             }
 
             //Only user type customer may make ratings
-            if (currentUser.UserType == UserType.Customer)
-            {             
-                Customer = true;
+            if (Customer == true)
+            {       
                 var kID = db.Kennel.Where(k => k.KennelID == id).First();
                 ViewBag.KennelName = kID.Name;
                 return View();
@@ -147,7 +169,7 @@ namespace Kennels.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(string id, [Bind(Include = "RatingID,Ratings,KennelID,Comment,RatingDate")] Rating rating)
         {
-            var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
+            var currentUser = getUser();
 
             if (ModelState.IsValid)
             {
@@ -199,7 +221,7 @@ namespace Kennels.Controllers
         // GET: Ratings/Edit/{RatingID}
         public async Task<ActionResult> Edit(int? id)
         {
-            var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
+            var currentUser = getUser();
 
             if (id == null)
             {
@@ -257,7 +279,7 @@ namespace Kennels.Controllers
         // GET: Ratings/Delete/{RatingID}
         public async Task<ActionResult> Delete(int? id)
         {
-            var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
+            var currentUser = getUser();
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);

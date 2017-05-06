@@ -83,18 +83,7 @@ namespace Kennels.Models
     }
 
     public class BookingViewModel : Booking
-    {
-        //[Required, DataType(DataType.Date), FutureDate(ErrorMessage = "Date cannot be in the past"), Display(Name = "From")]
-        //public DateTime StartDate { get; set; }
-        //[Required, DataType(DataType.Date), DateAfter("StartDate"), Display(Name = "To")]
-        //public DateTime EndDate { get; set; }
-
-        //public double CalcTotalPrice(double pricePerNight, double pricePerWeek, int totalNights)
-        //{
-        //    const int week = 7;
-        //    double totalPrice = ((totalNights % week) * pricePerNight) + ((totalNights / week) * pricePerWeek);
-        //    return totalPrice;
-        //}
+    {        
 
     }
 }

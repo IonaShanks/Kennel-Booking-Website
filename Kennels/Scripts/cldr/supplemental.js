@@ -1,15 +1,15 @@
 /**
- * CLDR JavaScript Library v0.4.1
+ * CLDR JavaScript Library v0.4.8
  * http://jquery.com/
  *
  * Copyright 2013 Rafael Xavier de Souza
  * Released under the MIT license
  * http://jquery.org/license
  *
- * Date: 2015-02-25T13:51Z
+ * Date: 2016-11-26T15:03Z
  */
 /*!
- * CLDR JavaScript Library v0.4.1 2015-02-25T13:51Z MIT license © Rafael Xavier
+ * CLDR JavaScript Library v0.4.8 2016-11-26T15:03Z MIT license © Rafael Xavier
  * http://git.io/h4lmVg
  */
 (function( factory ) {
@@ -19,7 +19,7 @@
 		define( [ "../cldr" ], factory );
 	} else if ( typeof module === "object" && typeof module.exports === "object" ) {
 		// Node. CommonJS.
-		module.exports = factory( require( "cldrjs" ) );
+		module.exports = factory( require( "../cldr" ) );
 	} else {
 		// Global
 		factory( Cldr );

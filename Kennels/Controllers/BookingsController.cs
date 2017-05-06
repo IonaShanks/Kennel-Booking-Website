@@ -28,6 +28,32 @@ namespace Kennels.Controllers
             manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
         }
 
+        public ApplicationUser getUser()
+        {
+            var currentUser = manager.FindById(User.Identity.GetUserId());
+            return currentUser;
+        }
+
+        public void isKennelOwner()
+        {
+            var currentUser = getUser();
+            if (currentUser != null)
+            {
+                if (currentUser.UserType == UserType.KennelOwner)
+                {
+                    KennelOwner = true;
+                }
+                else
+                {
+                    KennelOwner = false;
+                }
+            }
+            else
+            {
+                KennelOwner = false;
+            }
+        }
+
         //To send email confirmation 
         public void SendConfirmation(string Message, string Subject)
         {
@@ -57,14 +83,13 @@ namespace Kennels.Controllers
         // GET: Bookings
         public ActionResult Index()
         {
-            KennelOwner = false;
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            isKennelOwner();
+            var currentUser = getUser();
             IQueryable<Booking> bookings = db.Booking.Include(K => K.Kennel).Where(b => b.User.Id == currentUser.Id);
 
             //If the current user type is Kennel Owner
-            if (currentUser.UserType == UserType.KennelOwner)
-            {
-                KennelOwner = true;
+            if (KennelOwner == true)
+            {                
                 var ken = db.Kennel.Where(k => k.User.Id == currentUser.Id);
                 if (ken.Count() > 0)
                 {
@@ -97,8 +122,7 @@ namespace Kennels.Controllers
                 }
                 else
                 {
-                    //Returns a blank table
-                    
+                    //Returns a blank table                    
                     ViewBag.Empty = "You currently have no bookings.";
                     return View(bookings);
                 }
@@ -110,9 +134,9 @@ namespace Kennels.Controllers
         }
 
         // GET: Bookings/Details/{BookingID}
-        public async Task<ActionResult> Details(int? id)
+        public ActionResult Details(int? id)
         {
-            var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
+            var currentUser = getUser();
 
 
             if (id == null)
@@ -149,7 +173,7 @@ namespace Kennels.Controllers
 
         public ActionResult CreateViewModel(string id)
         {
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            var currentUser = getUser();
             var kID = db.Kennel.Where(k => k.KennelID == id).FirstOrDefault();
 
             if (id == null)
@@ -177,7 +201,7 @@ namespace Kennels.Controllers
         public ActionResult CreateViewModel(string id, BookingViewModel bm)
         {           
             
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            var currentUser = getUser();
 
             var kennel = db.Kennel.Where(k => k.KennelID.ToUpper() == id.ToUpper()).First();
 
@@ -240,7 +264,7 @@ namespace Kennels.Controllers
         //Only customers can create bookings
         public ActionResult Create(string id)
         {
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            var currentUser = getUser();
 
             if (id == null)
             {
@@ -257,14 +281,13 @@ namespace Kennels.Controllers
             if(createBooking != null)
             {
             int tNight = createBooking.CalcTotalNights(createBooking.StartDate, createBooking.EndDate);
-
+                           
             Booking booking = new Booking
             {
-                KennelID = id,
+                
                 StartDate = createBooking.StartDate,
                 EndDate = createBooking.EndDate,
-                PetsName = createBooking.PetsName,
-                User = currentUser,
+                PetsName = createBooking.PetsName,                
                 TotalNights = tNight,
                 Price = createBooking.CalcTotalPrice(kID.PricePerNight, kID.PricePerWeek, tNight)
             };
@@ -290,7 +313,7 @@ namespace Kennels.Controllers
         public async Task<ActionResult> Create(string id, [Bind(Include = "BookingID,StartDate,EndDate,PhoneNumber,PetsName,TotalNights,Price,KennelID")] Booking booking)
         {
             var kennel = db.Kennel.Where(k => k.KennelID.ToUpper() == id.ToUpper()).First();
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            var currentUser = getUser();
             booking = TempData["confirm"] as Booking;
 
             if(TempData["confirm"] != null)
@@ -363,16 +386,13 @@ namespace Kennels.Controllers
                 TempData["Oops"] = "Oops something has gone wrong please try again";
                 return RedirectToAction("CreateViewModel", new { id = id });
             }
-        }
-    
+        } 
        
-
-
 
         // GET: Bookings/Delete/{BookingID}
         public async Task<ActionResult> Delete(int? id)
         {
-            var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
+            var currentUser = getUser();
             bool kenOwn = false;
 
             if (id == null)
@@ -425,7 +445,7 @@ namespace Kennels.Controllers
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
             Booking booking = await db.Booking.FindAsync(id);
-            var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
+            var currentUser = getUser();
             var kennel = db.Kennel.Where(k => k.KennelID == booking.KennelID).First();
 
             for (DateTime date = booking.StartDate; date <= booking.EndDate; date = date.AddDays(1))

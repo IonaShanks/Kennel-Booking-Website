@@ -86,8 +86,7 @@ namespace Kennels.Controllers
             var userId = User.Identity.GetUserId();
             var user = Db.Users.SingleOrDefault(u => u.Id == userId);
             var model = new EditUserViewModel(user);
-            return View(model);
-
+            return View();
 
         }
         [HttpPost]
@@ -256,9 +255,7 @@ namespace Kennels.Controllers
         }
 
         
-
-
-        //
+                
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
         {

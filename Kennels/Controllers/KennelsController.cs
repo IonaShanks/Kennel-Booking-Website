@@ -17,6 +17,14 @@ namespace Kennels.Controllers
     [Authorize]
     public class KennelsController : Controller
     {
+        private KennelsContext db = new KennelsContext();
+        private UserManager<ApplicationUser> manager;
+        public KennelsController()
+        {
+            db = new KennelsContext();
+            manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
+        }
+
         public static bool KennelOwner = false;
         public static IQueryable<TotalRating> rate;
         public static TextInfo myTI = new CultureInfo("en-IE", false).TextInfo;
@@ -27,14 +35,10 @@ namespace Kennels.Controllers
             return q;
         }
 
-
-
-        private KennelsContext db = new KennelsContext();
-        private UserManager<ApplicationUser> manager;
-        public KennelsController()
+        public ApplicationUser getUser()
         {
-            db = new KennelsContext();
-            manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
+            var currentUser = manager.FindById(User.Identity.GetUserId());
+            return currentUser;
         }
 
         //For use in view
@@ -42,36 +46,196 @@ namespace Kennels.Controllers
         public static DateTime searchEn;
         public static bool dateSearch = false;
 
-        // GET: Kennels
-        [AllowAnonymous]
-        public ActionResult Index(string county, string searchName, DateTime? searchStart, DateTime? searchEnd, string searchRate, string sort)
+
+
+        public List<Kennel> searchByRating(string searchRate)
         {
-            dateSearch = false;
-            //To only show specific things to specific users in the view
-            KennelOwner = false;
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            var rateList = new List<Kennel>();
+            //Loops through every kennel in the kennel database
+            foreach (Kennel ken in db.Kennel)
+            {
+                var rateqry = db.TotalRating.Where(r => r.KennelID == ken.KennelID).FirstOrDefault();
+                int search = Convert.ToInt32(searchRate);
+
+                //Adds to list is kennel not yet rated
+                if (rateqry == null)
+                {
+                    rateList.Add(ken);
+                }
+                if (rateqry != null)
+                {
+                    //Adds to list if kennel rating >= search rating
+                    if (rateqry.AverageRating >= search)
+                    {
+                        rateList.Add(ken);
+                    }
+                }
+            }
+            return rateList;
+        }
+
+        public IQueryable<Kennel> searchByDate(DateTime? searchStart, DateTime? searchEnd, string searchRate)
+        {
+            IQueryable<Kennel> kennels = db.Kennel.Include(k => k.TotalRating);
+            var rateSearchList = new List<Kennel>();
+            //So that rating doesn't override date it is included
+            if (!string.IsNullOrEmpty(searchRate))
+            {
+                rateSearchList = searchByRating(searchRate);
+            }
+            else
+            {
+                //Loops through every kennel in the kennel database
+                foreach (Kennel k in db.Kennel)
+                {
+                    rateSearchList.Add(k);
+                }
+            }
+
+            //Checks the start date is before the end date
+            if (searchEnd > searchStart)
+            {
+
+                dateSearch = true;
+                //DateTime dt = DateTime.ParseExact(searchStart.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                //Converts the variables from DateTime? to DateTime 
+                DateTime ss = Convert.ToDateTime(searchStart);
+                DateTime se = Convert.ToDateTime(searchEnd);
+
+                searchSt = ss;
+                searchEn = se;
+
+                //Creates a list of the kennels to be displayed
+                var avList = new List<Kennel>();
+
+                //Loops through every kennel in the kennel database
+                foreach (Kennel kennel in rateSearchList)
+                {
+                    //Bool to keep track if a kennel is available or not
+                    bool kenAvail = false;
+                    //If the search exceeds the maximum days
+                    if ((se - ss).Days >= kennel.MaxDays)
+                    {
+                        kenAvail = true;
+                    }
+                    //If the search doesn't exceed maximum days
+                    else
+                    {
+                        for (DateTime date = ss; date <= se; date = date.AddDays(1))
+                        {
+                            var ka = db.KennelAvailability.Where(k => k.KennelID == kennel.KennelID && k.BookingDate == date).FirstOrDefault();
+                            //Could be null if the kennel hasn't been booked at all on the day
+                            if (ka != null)
+                            {
+                                //Triggers true if the kennel is full for part of or all of the search dates
+                                if (ka.Full == true)
+                                {
+                                    kenAvail = true;
+                                }
+                            }
+                        }
+
+                    }
+                    //If the kennel is not full for any of the days
+                    if (kenAvail != true)
+                    {
+                        //Populates list
+                        avList.Add(kennel);
+                    }
+
+                }
+
+                BookingViewModel sd = new BookingViewModel
+                {
+                    StartDate = ss,
+                    EndDate = se
+                };
+
+                TempData["searchDates"] = sd;
+                kennels = avList.AsQueryable();
+            }
+            else
+            {
+                kennels = rateSearchList.AsQueryable();
+                ViewBag.Invalid = "Invalid dates, start date must be before end date!";
+            }
+            return kennels;
+        }
+
+        public IQueryable<Kennel> sortBy(string sort)
+        {
+            IQueryable<Kennel> kennels = db.Kennel.Include(k => k.TotalRating);
+            //Orders the kennel list based on the sort selected from the list.         
+            if (sort == "Name (A-Z)")
+            {
+                kennels = kennels.OrderBy(k => k.Name);
+            }
+            else if (sort == "Name (Z-A)")
+            {
+                kennels = kennels.OrderByDescending(k => k.Name);
+            }
+            else if (sort == "Price per Night (H-L)")
+            {
+                kennels = kennels.OrderByDescending(k => k.PricePerNight);
+            }
+            else if (sort == "Price per Night (L-H)")
+            {
+                kennels = kennels.OrderBy(k => k.PricePerNight);
+            }
+            else if (sort == "Price per Week (H-L)")
+            {
+                kennels = kennels.OrderByDescending(k => k.PricePerWeek);
+            }
+            else /*if (sort == "Price per Week (L-H)")*/
+            {
+                kennels = kennels.OrderBy(k => k.PricePerWeek);
+            }
+            return kennels;
+        }
+
+        public void isKennelOwner()
+        {
+            var currentUser = getUser();
             if (currentUser != null)
             {
                 if (currentUser.UserType == UserType.KennelOwner)
                 {
                     KennelOwner = true;
                 }
+                else
+                {
+                    KennelOwner = false;
+                }
             }
+            else
+            {
+                KennelOwner = false;
+            }
+        }
 
-            //Creates a list of distinct countys that have kennels in them.
-            var CountyList = new List<string>();
-            var CountyQry = db.Kennel.Select(c => c.County.ToString());
-            CountyList.AddRange(CountyQry.Distinct());
-            ViewBag.county = new SelectList(CountyList);
-
+        public List<int> getRatingList()
+        {
             //Creates a list of ratings 1 - 5
-            var RatingList = new List<double>();
+            var RatingList = new List<int>();
             for (int i = 1; i <= 5; i++)
             {
                 RatingList.Add(i);
             }
-            ViewBag.rate = new SelectList(RatingList);
+            return RatingList;
+        }
 
+        public List<string> getCountyList()
+        {
+            //Creates a list of distinct countys that have kennels in them.
+            var CountyList = new List<string>();
+            var CountyQry = db.Kennel.Select(c => c.County.ToString());
+            CountyList.AddRange(CountyQry.Distinct());
+            return CountyList;
+        }
+
+        public List<string> getSortList()
+        {
             //Select list to sort the table
             var SortList = new List<string>();
             SortList.Add("Name (A-Z)");
@@ -80,174 +244,42 @@ namespace Kennels.Controllers
             SortList.Add("Price per Night (L-H)");
             SortList.Add("Price per Week (H-L)");
             SortList.Add("Price per Week (L-H)");
-            ViewBag.sort = new SelectList(SortList);
+            return SortList;
+        }
+
+        // GET: Kennels
+        [AllowAnonymous]
+        public ActionResult Index(string county, string searchName, DateTime? searchStart, DateTime? searchEnd, string searchRate, string sort)
+        {
+            //To only show specific things to specific users in the view
+            dateSearch = false;
+            isKennelOwner();
+           
+            //Creating Select lists for each             
+            ViewBag.county = new SelectList(getCountyList());            
+            ViewBag.rate = new SelectList(getRatingList());           
+            ViewBag.sort = new SelectList(getSortList());
 
             IQueryable<Kennel> kennels = db.Kennel.Include(k => k.TotalRating);
-
-
+        
             //Search by date
             if (searchStart.HasValue && searchEnd.HasValue)
             {
-
-                var rateSearchList = new List<Kennel>();
-                //So that rating doesn't override date it is included
-                if (!string.IsNullOrEmpty(searchRate))
-                {
-                    //Loops through every kennel in the kennel database
-                    foreach (Kennel ken in db.Kennel)
-                    {
-                        var rateqry = db.TotalRating.Where(r => r.KennelID == ken.KennelID).FirstOrDefault();
-                        int search = Convert.ToInt32(searchRate);
-
-                        //Adds to list is kennel not yet rated
-                        if (rateqry == null)
-                        {
-                            rateSearchList.Add(ken);
-                        }
-                        if (rateqry != null)
-                        {
-                            //Adds to list if kennel rating >= search rating
-                            if (rateqry.AverageRating >= search)
-                            {
-                                rateSearchList.Add(ken);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    //Loops through every kennel in the kennel database
-                    foreach (Kennel k in db.Kennel)
-                    {
-                        rateSearchList.Add(k);
-                    }
-                }
-
-                //Checks the start date is before the end date
-                if (searchEnd > searchStart)
-                {
-
-                    dateSearch = true;
-                    //DateTime dt = DateTime.ParseExact(searchStart.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture);
-
-                    //Converts the variables from DateTime? to DateTime 
-                    DateTime ss = Convert.ToDateTime(searchStart);
-                    DateTime se = Convert.ToDateTime(searchEnd);
-
-                    searchSt = ss;
-                    searchEn = se;
-
-                    //Creates a list of the kennels to be displayed
-                    var avList = new List<Kennel>();
-
-                    //Loops through every kennel in the kennel database
-                    foreach (Kennel kennel in rateSearchList)
-                    {
-                        //Bool to keep track if a kennel is available or not
-                        bool kenAvail = false;
-                        //If the search exceeds the maximum days
-                        if ((se - ss).Days >= kennel.MaxDays)
-                        {
-                            kenAvail = true;
-                        }
-                        //If the search doesn't exceed maximum days
-                        else
-                        {
-                            for (DateTime date = ss; date <= se; date = date.AddDays(1))
-                            {
-                                var ka = db.KennelAvailability.Where(k => k.KennelID == kennel.KennelID && k.BookingDate == date).FirstOrDefault();
-                                //Could be null if the kennel hasn't been booked at all on the day
-                                if (ka != null)
-                                {
-                                    //Triggers true if the kennel is full for part of or all of the search dates
-                                    if (ka.Full == true)
-                                    {
-                                        kenAvail = true;
-                                    }
-                                }
-                            }
-
-                        }
-                        //If the kennel is not full for any of the days
-                        if (kenAvail != true)
-                        {
-                            //Populates list
-                            avList.Add(kennel);
-                        }
-
-                    }
-
-                    BookingViewModel sd = new BookingViewModel
-                    {
-                        StartDate = ss,
-                        EndDate = se
-                    };
-
-                    TempData["searchDates"] = sd;
-                    kennels = avList.AsQueryable();
-                }
-                else
-                {
-                    kennels = rateSearchList.AsQueryable();
-                    ViewBag.Invalid = "Invalid dates, start date must be before end date!";
-                }
+                kennels = searchByDate(searchStart, searchEnd, searchRate);
             }
-
 
             //Search by rating if search dates are not entered (overrides if entered)
             if (!string.IsNullOrEmpty(searchRate) && !searchStart.HasValue && !searchEnd.HasValue)
             {
-                var rateList = new List<Kennel>();
-                foreach (Kennel kennel in db.Kennel)
-                {
-                    var rateqry = db.TotalRating.Where(r => r.KennelID == kennel.KennelID).FirstOrDefault();
-                    int search = Convert.ToInt32(searchRate);
-                    //If null means it hasn't been rated so shows at all star ratings
-                    if (rateqry == null)
-                    {
-                        rateList.Add(kennel);
-                    }
-                    if (rateqry != null)
-                    {
-                        //Adds the kennels with a rating >= the rating input in the search paramaters
-                        if (rateqry.AverageRating >= search)
-                        {
-                            rateList.Add(kennel);
-                        }
-                    }
-                }
+                var rateList = new List<Kennel>();               
+                rateList = searchByRating(searchRate);
                 kennels = rateList.AsQueryable();
             }
-
-
+            
             //Sort results
             if (!string.IsNullOrEmpty(sort))
             {
-                //Orders the kennel list based on the sort selected from the list.         
-                if (sort == "Name (A-Z)")
-                {
-                    kennels = kennels.OrderBy(k => k.Name);
-                }
-                else if (sort == "Name (Z-A)")
-                {
-                    kennels = kennels.OrderByDescending(k => k.Name);
-                }
-                else if (sort == "Price per Night (H-L)")
-                {
-                    kennels = kennels.OrderByDescending(k => k.PricePerNight);
-                }
-                else if (sort == "Price per Night (L-H)")
-                {
-                    kennels = kennels.OrderBy(k => k.PricePerNight);
-                }
-                else if (sort == "Price per Week (H-L)")
-                {
-                    kennels = kennels.OrderByDescending(k => k.PricePerWeek);
-                }
-                else /*if (sort == "Price per Week (L-H)")*/
-                {
-                    kennels = kennels.OrderBy(k => k.PricePerWeek);
-                }
+                kennels = sortBy(sort);
             }
 
             //Search by name
@@ -264,19 +296,26 @@ namespace Kennels.Controllers
                 kennels = kennels.Where(c => c.County.ToString() == county);
             }
 
-
             rate = db.TotalRating;
             //Displays the view from all the queries
             return View(kennels);
         }
 
-        public ActionResult MyKennels()
+        public UserType getUserType()
         {
             var currentUser = manager.FindById(User.Identity.GetUserId());
+            return currentUser.UserType;
+        }
+
+        
+
+        public ActionResult MyKennels()
+        {
+            var currentUser = getUser();
             IQueryable<Kennel> kennels = db.Kennel.Where(b => b.User.Id == currentUser.Id);
 
             //If the user type is Kennel Owner
-            if (currentUser.UserType == UserType.KennelOwner)
+            if (getUserType() == UserType.KennelOwner)
             {
                 //If they have added a kennel
                 if (kennels.Count() > 0)
@@ -303,35 +342,8 @@ namespace Kennels.Controllers
             }
         }
 
-        [AllowAnonymous]
-        // GET: Kennels/Details/{KennelID}
-        public async Task<ActionResult> Details(string id)
-        {            
-            Booking sd = TempData["searchDates"] as Booking;
-            TempData["searchDates"] = sd;
-
-            KennelOwner = false;
-            var currentUser = manager.FindById(User.Identity.GetUserId());
-            if (currentUser != null)
-            {
-                if (currentUser.UserType == UserType.KennelOwner)
-                {
-                    KennelOwner = true;
-                }
-            }
-
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-
-            Kennel kennels = await db.Kennel.FindAsync(id);
-            if (kennels == null)
-            {
-                return HttpNotFound();
-            }
-
-            //Adds rating to the details section
+        public string getAvRate(string id)
+        {
             var RateQry = db.TotalRating.Where(r => r.KennelID == id).FirstOrDefault();
             if (RateQry != null)
             {
@@ -348,12 +360,34 @@ namespace Kennels.Controllers
                 {
                     avRate = avRate.Substring(0, 3);
                 }
-                ViewBag.avgRating = avRate + " " + st + " (" + RateQry.TotalRaters + tr + ")";
+                return ViewBag.avgRating = avRate + " " + st + " (" + RateQry.TotalRaters + tr + ")";
             }
             else
             {
-                ViewBag.avgRating = "No rating!";
+                return ViewBag.avgRating = "No rating!";
             }
+        }
+
+        [AllowAnonymous]
+        // GET: Kennels/Details/{KennelID}
+        public async Task<ActionResult> Details(string id)
+        {            
+            Booking sd = TempData["searchDates"] as Booking;
+            TempData["searchDates"] = sd;
+                                    
+            isKennelOwner();
+            
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            Kennel kennels = await db.Kennel.FindAsync(id);
+            if (kennels == null)
+            {
+                return HttpNotFound();
+            }
+            getAvRate(id);
 
             return View(kennels);
         }
@@ -361,10 +395,10 @@ namespace Kennels.Controllers
 
         // GET: Kennels/Create
         public ActionResult Create()
-        {
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+        {            
+            isKennelOwner();
             //Only type kennel owner is authorized to add kennels
-            if (currentUser.UserType != UserType.KennelOwner)
+            if (KennelOwner == false)
             {
                 TempData["Unauth"] = "You are not authorised to do that, log in as a different user";
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
@@ -378,7 +412,7 @@ namespace Kennels.Controllers
         public async Task<ActionResult> Create([Bind(Include = "KennelID,Name,Address,County,Town,PhoneNumber,Email,Capacity,PricePerNight,PricePerWeek,MaxDays,LgeDog,MedDog,SmlDog,CancellationPeriod,Description,Grooming,Training")] Kennel kennels)
         {
 
-            var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
+            var currentUser = getUser();
 
             if (ModelState.IsValid)
             {
@@ -402,7 +436,7 @@ namespace Kennels.Controllers
         // GET: Kennels/Edit/{KennelID}
         public async Task<ActionResult> Edit(string id)
         {
-            var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
+            var currentUser = getUser();
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -445,7 +479,7 @@ namespace Kennels.Controllers
         // GET: Kennels/Delete/{KennelID}
         public async Task<ActionResult> Delete(string id)
         {
-            var currentUser = await manager.FindByIdAsync(User.Identity.GetUserId());
+            var currentUser = getUser();
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
