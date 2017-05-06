@@ -86,7 +86,7 @@ namespace Kennels.Controllers
             var userId = User.Identity.GetUserId();
             var user = Db.Users.SingleOrDefault(u => u.Id == userId);
             var model = new EditUserViewModel(user);
-            return View();
+            return View(model);
 
         }
         [HttpPost]

@@ -38,7 +38,7 @@ namespace Kennels.Controllers
             var currentUser = getUser();
             if (currentUser != null)
             {
-                if (currentUser.UserType == UserType.KennelOwner)
+                if (currentUser.UserType == UserType.Customer)
                 {
                     Customer = true;
                 }
@@ -129,11 +129,11 @@ namespace Kennels.Controllers
         }
 
         // GET: Ratings/Create
-        public ActionResult Create(string id, ApplicationUser user)
+        public ActionResult Create(string id)
         {
             isCustomer();
             var currentUser = getUser();
-            user = currentUser;
+            
             bool ratingExists = db.Rating.Where(r => r.KennelID == id && r.User.Id == currentUser.Id).Count() > 0;
             
             if (id == null)
@@ -222,6 +222,7 @@ namespace Kennels.Controllers
         public async Task<ActionResult> Edit(int? id)
         {
             var currentUser = getUser();
+            isCustomer();
 
             if (id == null)
             {

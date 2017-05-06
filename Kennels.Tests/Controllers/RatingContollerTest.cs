@@ -81,11 +81,11 @@ namespace Kennels.Tests.Controllers
             Assert.IsTrue(attributes.Any(), "No AuthorizeAttribute found on ChangePassword(ChangePasswordModel model) method");
         }
 
-        [TestMethod]
-        public void CreateTest()
-        {
-            var controller = new RatingsController();
-        }
+        //[TestMethod]
+        //public void CreateTest()
+        //{
+        //    var controller = new RatingsController();
+        //}
 
         //[TestMethod]
         //public void Index_Returns_ActionResult()
@@ -121,43 +121,43 @@ namespace Kennels.Tests.Controllers
 
 
 
-[TestMethod]
-        public void TestDetailsViewNotFound()
-        {
-        var controller = new RatingsController();            
-            var result = controller.Details(null) ;            
-            Assert.AreEqual(HttpStatusCode.BadRequest, result);
-            Assert.IsInstanceOfType(result, typeof(HttpStatusCode));
+        //[TestMethod]
+        //public void TestDetailsViewNotFound()
+        //{
+        //    var controller = new RatingsController();
+        //    var result = controller.Details(null);
+        //    Assert.AreEqual(HttpStatusCode.BadRequest, result);
+        //    Assert.IsInstanceOfType(result, typeof(HttpStatusCode));
 
-        }
-        [TestMethod]
-        public void BookingTestDetailsViewUnauth()
-        {
-            var controller = new BookingsController();
-            var result = controller.Details(null);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result);
-            //Assert.IsInstanceOfType(result, typeof(HttpStatusCode));
+        //}
+        //[TestMethod]
+        //public void BookingTestDetailsViewUnauth()
+        //{
+        //    var controller = new BookingsController();
+        //    var result = controller.Details(null);
+        //    Assert.AreEqual(HttpStatusCode.BadRequest, result);
+        //    //Assert.IsInstanceOfType(result, typeof(HttpStatusCode));
 
-        }
+        //}
 
-        [TestMethod]
-        public void TestKennelRatingsView()
-        {
+        //[TestMethod]
+        //public void TestKennelRatingsView()
+        //{
 
-            var controller = new RatingsController();
+        //    var controller = new RatingsController();
 
-            var result = controller.KennelRatings("DIT123");
-            Assert.IsNotNull(result);
-        }
+        //    var result = controller.KennelRatings("DIT123");
+        //    Assert.IsNotNull(result);
+        //}
 
-        [TestMethod]
-        public void TestIndexAccess()
-        {
-            var controller = new RatingsController();
-            var result = controller.Index();
+        //[TestMethod]
+        //public void TestIndexAccess()
+        //{
+        //    var controller = new RatingsController();
+        //    var result = controller.Index();
 
 
-        }
+        //}
 
         //[TestMethod]
         //public void test_validation()
