@@ -96,7 +96,7 @@ namespace Kennels.Models
         public string PhoneNumber { get; set; }
 
         [Required, Display(Name = "User Type")]
-        public UserType UserType { get; set; }       
+        public UserType UserType { get; set; }
     }
 
 

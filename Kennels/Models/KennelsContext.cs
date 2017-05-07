@@ -20,7 +20,6 @@ namespace Kennels.Models
         public DbSet<Booking> Booking { get; set; }
         public DbSet<TotalRating> TotalRating { get; set; }
         public DbSet<Rating> Rating { get; set; }
-
-       
+        
     }
 }

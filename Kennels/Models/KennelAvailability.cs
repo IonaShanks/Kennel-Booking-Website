@@ -10,7 +10,7 @@ namespace Kennels.Models
         public DateTime BookingDate { get; set; }
         public int Availability { get; set; }
         public bool Full { get; set; }
-        
+
         [Key, Column(Order = 0)]
         public String KennelID { get; set; }
         public virtual Kennel Kennel { get; set; }

@@ -254,14 +254,14 @@ namespace Kennels.Controllers
             //To only show specific things to specific users in the view
             dateSearch = false;
             isKennelOwner();
-           
+
             //Creating Select lists for each             
-            ViewBag.county = new SelectList(getCountyList());            
-            ViewBag.rate = new SelectList(getRatingList());           
+            ViewBag.county = new SelectList(getCountyList());
+            ViewBag.rate = new SelectList(getRatingList());
             ViewBag.sort = new SelectList(getSortList());
 
             IQueryable<Kennel> kennels = db.Kennel.Include(k => k.TotalRating);
-        
+
             //Search by date
             if (searchStart.HasValue && searchEnd.HasValue)
             {
@@ -271,11 +271,11 @@ namespace Kennels.Controllers
             //Search by rating if search dates are not entered (overrides if entered)
             if (!string.IsNullOrEmpty(searchRate) && !searchStart.HasValue && !searchEnd.HasValue)
             {
-                var rateList = new List<Kennel>();               
+                var rateList = new List<Kennel>();
                 rateList = searchByRating(searchRate);
                 kennels = rateList.AsQueryable();
             }
-            
+
             //Sort results
             if (!string.IsNullOrEmpty(sort))
             {
@@ -307,7 +307,7 @@ namespace Kennels.Controllers
             return currentUser.UserType;
         }
 
-        
+
 
         public ActionResult MyKennels()
         {
@@ -371,12 +371,12 @@ namespace Kennels.Controllers
         [AllowAnonymous]
         // GET: Kennels/Details/{KennelID}
         public async Task<ActionResult> Details(string id)
-        {            
+        {
             Booking sd = TempData["searchDates"] as Booking;
             TempData["searchDates"] = sd;
-                                    
+
             isKennelOwner();
-            
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -395,7 +395,7 @@ namespace Kennels.Controllers
 
         // GET: Kennels/Create
         public ActionResult Create()
-        {            
+        {
             isKennelOwner();
             //Only type kennel owner is authorized to add kennels
             if (KennelOwner == false)

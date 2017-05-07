@@ -6,12 +6,12 @@ namespace Kennels.Models
 {
     //Validation to check that the date is not in the past.
     public class FutureDateAttribute : ValidationAttribute
-    {        
+    {
         public override bool IsValid(object value)
         {
             DateTime date = Convert.ToDateTime(value);
             return date >= DateTime.Now;
-        }  
+        }
     }
 
     //Validation to check that the start date is before the end date.
@@ -29,7 +29,7 @@ namespace Kennels.Models
 
             if (startDate >= endDate)
             {
-                return new ValidationResult("Stay must be at least one night");                
+                return new ValidationResult("Stay must be at least one night");
             }
             else
             {
@@ -42,17 +42,17 @@ namespace Kennels.Models
     public class Booking
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int BookingID { get; set; }        
-        [Required, DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}"), FutureDate(ErrorMessage = "Date cannot be in the past"), Display(Name ="From")]
+        public int BookingID { get; set; }
+        [Required, DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}"), FutureDate(ErrorMessage = "Date cannot be in the past"), Display(Name = "From")]
         public DateTime StartDate { get; set; }
-        [Required, DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}"), DateAfter("StartDate"), Display(Name ="To")]        
+        [Required, DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}"), DateAfter("StartDate"), Display(Name = "To")]
         public DateTime EndDate { get; set; }
         [Phone, Display(Name = "Contact Number")]
         public string PhoneNumber { get; set; }
 
-        [Required, Display(Name ="Pets Name")]
+        [Required, Display(Name = "Pets Name")]
         public string PetsName { get; set; }
-         
+
         [Display(Name = "Total Nights")]
         public int TotalNights { get; set; }
 
@@ -62,7 +62,7 @@ namespace Kennels.Models
             int Tnights = (endDate - startDate).Days;
             return Tnights;
 
-        }    
+        }
         [Display(Name = "Total Price"), DisplayFormat(DataFormatString = "{0:C}")]
         public double Price { get; set; }
 
@@ -70,7 +70,7 @@ namespace Kennels.Models
         //and then calculating the number of weeks and calculating the price per week, and adding them together to get the total price.
         public double CalcTotalPrice(double pricePerNight, double pricePerWeek, int totalNights)
         {
-            const int week = 7;            
+            const int week = 7;
             double totalPrice = ((totalNights % week) * pricePerNight) + ((totalNights / week) * pricePerWeek);
             return totalPrice;
         }
@@ -83,7 +83,7 @@ namespace Kennels.Models
     }
 
     public class BookingViewModel : Booking
-    {        
+    {
 
     }
 }

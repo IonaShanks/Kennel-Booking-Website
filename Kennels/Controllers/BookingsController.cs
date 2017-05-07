@@ -18,10 +18,10 @@ namespace Kennels.Controllers
     {
         private KennelsContext db = new KennelsContext();
         private UserManager<ApplicationUser> manager;
-       
+
         //KennelOwner for use in view
         public static bool KennelOwner = false;
-        
+
         public BookingsController()
         {
             db = new KennelsContext();
@@ -55,12 +55,11 @@ namespace Kennels.Controllers
         }
 
         //To send email confirmation 
-        public void SendConfirmation(string Message, string Subject)
+        public void SendConfirmation(string Message, string Subject, string Email)
         {
-            //Making email
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            //Making email           
             var message = new MailMessage();
-            message.To.Add(new MailAddress(currentUser.Email));
+            message.To.Add(new MailAddress(Email));
             message.From = new MailAddress("IonaKennel@gmail.com");
             message.Subject = Subject;
             message.Body = string.Format(Message);
@@ -89,7 +88,7 @@ namespace Kennels.Controllers
 
             //If the current user type is Kennel Owner
             if (KennelOwner == true)
-            {                
+            {
                 var ken = db.Kennel.Where(k => k.User.Id == currentUser.Id);
                 if (ken.Count() > 0)
                 {
@@ -118,7 +117,7 @@ namespace Kennels.Controllers
                 //If the Current user has bookings it shows them a list of their bookings, if not it displays a blank table with a message 
                 if (bookings.Count() > 0)
                 {
-                    return View(bookings);                    
+                    return View(bookings);
                 }
                 else
                 {
@@ -137,7 +136,6 @@ namespace Kennels.Controllers
         public ActionResult Details(int? id)
         {
             var currentUser = getUser();
-
 
             if (id == null)
             {
@@ -169,8 +167,6 @@ namespace Kennels.Controllers
             return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
         }
 
-
-
         public ActionResult CreateViewModel(string id)
         {
             var currentUser = getUser();
@@ -186,9 +182,9 @@ namespace Kennels.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
             ViewBag.KennelName = kID.Name;
-            Booking bookingDates = TempData["searchDates"] as Booking;            
-            if(TempData["searchDates"] != null)
-            { 
+            Booking bookingDates = TempData["searchDates"] as Booking;
+            if (TempData["searchDates"] != null)
+            {
                 return View(bookingDates);
             }
             else
@@ -199,8 +195,8 @@ namespace Kennels.Controllers
         private bool full;
         [HttpPost]
         public ActionResult CreateViewModel(string id, BookingViewModel bm)
-        {           
-            
+        {
+
             var currentUser = getUser();
 
             var kennel = db.Kennel.Where(k => k.KennelID.ToUpper() == id.ToUpper()).First();
@@ -219,7 +215,7 @@ namespace Kennels.Controllers
             }
 
             if (ModelState.IsValid)
-            {    
+            {
                 int Tnights = bm.CalcTotalNights(bm.StartDate, bm.EndDate);
                 if (Tnights < kennel.MaxDays)
                 {
@@ -247,17 +243,17 @@ namespace Kennels.Controllers
                     //return a view where it says exceeds max days. 
                     ModelState.AddModelError("", "Exceded maximum days kennel allows bookings for (Maximum: " + kennel.MaxDays + " days)");
                     return View(bm);
-                   
+
                 }
-                
+
             }
             else
             {
-                               
+
                 ModelState.AddModelError("", "Somethings not right please correct and try again.");
                 return View(bm);
             }
-        
+
         }
 
         // GET: Bookings/Create
@@ -278,24 +274,24 @@ namespace Kennels.Controllers
             var kID = db.Kennel.Where(k => k.KennelID == id).First();
 
             var createBooking = TempData["booking"] as BookingViewModel;
-            if(createBooking != null)
+            if (createBooking != null)
             {
-            int tNight = createBooking.CalcTotalNights(createBooking.StartDate, createBooking.EndDate);
-                           
-            Booking booking = new Booking
-            {
-                
-                StartDate = createBooking.StartDate,
-                EndDate = createBooking.EndDate,
-                PetsName = createBooking.PetsName,                
-                TotalNights = tNight,
-                Price = createBooking.CalcTotalPrice(kID.PricePerNight, kID.PricePerWeek, tNight)
-            };
+                int tNight = createBooking.CalcTotalNights(createBooking.StartDate, createBooking.EndDate);
 
-            TempData["confirm"] = booking;
+                Booking booking = new Booking
+                {
 
-            ViewBag.KennelName = kID.Name;
-            return View(booking);
+                    StartDate = createBooking.StartDate,
+                    EndDate = createBooking.EndDate,
+                    PetsName = createBooking.PetsName,
+                    TotalNights = tNight,
+                    Price = createBooking.CalcTotalPrice(kID.PricePerNight, kID.PricePerWeek, tNight)
+                };
+
+                TempData["confirm"] = booking;
+
+                ViewBag.KennelName = kID.Name;
+                return View(booking);
             }
             else
             {
@@ -304,8 +300,40 @@ namespace Kennels.Controllers
         }
 
 
-        //Declaring a boolean for use within the Create ActionResult
-        
+        public void updateKennelAvailability(DateTime date, string id, Kennel kennel)
+        {
+            //for the date the loop is on in the iteration it will check to see if the date already exists  
+            bool dateExists = db.KennelAvailability.Where(k => k.KennelID.ToUpper() == id.ToUpper() && k.BookingDate == date).Count() > 0;
+            //if the date does not exist it will add it to the table                      
+            if (dateExists == false)
+            {
+                var newDate = new KennelAvailability()
+                {
+                    KennelID = id.ToUpper(),
+                    BookingDate = date,
+                    Availability = 1
+                };
+                db.KennelAvailability.Add(newDate);
+            }
+            //if the date does exists it will update the existing entry.
+            else
+            {
+                //Adds 1 to Availability on the KennelAvailability table where the KennelId and Date match those of the booking.
+                var ka = db.KennelAvailability.Where(r => r.KennelID.ToUpper() == id.ToUpper() && r.BookingDate == date).First();
+                ka.Availability += 1;
+                db.Entry(ka).State = EntityState.Modified;
+
+
+                //Updates the KennelAvailability to full if the kennel has reached capacity for that date. 
+                if (ka.Availability == kennel.Capacity)
+                {
+                    ka.Full = true;
+                    db.Entry(ka).State = EntityState.Modified;
+
+                }
+            }
+        }
+
         // POST: Bookings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -316,78 +344,49 @@ namespace Kennels.Controllers
             var currentUser = getUser();
             booking = TempData["confirm"] as Booking;
 
-            if(TempData["confirm"] != null)
-            { 
-            //Loops through the dates in the booking from start to end
-            for (DateTime date = booking.StartDate; date <= booking.EndDate; date = date.AddDays(1))
+            if (TempData["confirm"] != null)
             {
-                //for the date the loop is on in the iteration it will check to see if the date already exists
-                bool dateExists = db.KennelAvailability.Where(k => k.KennelID.ToUpper() == id.ToUpper() && k.BookingDate == date).Count() > 0;
-
-                //if the date does not exist it will add it to the table                      
-                if (dateExists == false)
+                //Loops through the dates in the booking from start to end
+                for (DateTime date = booking.StartDate; date <= booking.EndDate; date = date.AddDays(1))
                 {
-                    var newDate = new KennelAvailability()
-                    {
-                        KennelID = id.ToUpper(),
-                        BookingDate = date,
-                        Availability = 1
-                    };
 
-                    db.KennelAvailability.Add(newDate);
-                    await db.SaveChangesAsync();
-                }
-
-                //if the date does exists it will update the existing entry.
-                else
-                {
-                    //Adds 1 to Availability on the KennelAvailability table where the KennelId and Date match those of the booking.
-                    var ka = db.KennelAvailability.Where(r => r.KennelID.ToUpper() == id.ToUpper() && r.BookingDate == date).First();
-                    ka.Availability += 1;
-                    db.Entry(ka).State = EntityState.Modified;
+                    updateKennelAvailability(date, id, kennel);
                     await db.SaveChangesAsync();
 
-                    //Updates the KennelAvailability to full if the kennel has reached capacity for that date. 
-                    if (ka.Availability == kennel.Capacity)
-                    {
-                        ka.Full = true;
-                        db.Entry(ka).State = EntityState.Modified;
-                        await db.SaveChangesAsync();
-                    }
                 }
-            }
 
-            //Calls the funtion to calculate the total nights based on the start and end date specified by the user
-            booking.TotalNights = booking.CalcTotalNights(booking.StartDate, booking.EndDate);
-            booking.PhoneNumber = currentUser.PhoneNumber;
-            //Calls the function CalcTotalPrice which takes in (double pricePerNight, double pricePerWeek) to calculate the price based on the prices the kennel offers.
-            booking.Price = booking.CalcTotalPrice(kennel.PricePerNight, kennel.PricePerWeek, booking.TotalNights);
-            booking.KennelID = id;
-            booking.User = currentUser;
-            db.Booking.Add(booking);
+                //Calls the funtion to calculate the total nights based on the start and end date specified by the user
+                booking.TotalNights = booking.CalcTotalNights(booking.StartDate, booking.EndDate);
+                booking.PhoneNumber = currentUser.PhoneNumber;
+                //Calls the function CalcTotalPrice which takes in (double pricePerNight, double pricePerWeek) to calculate the price based on the prices the kennel offers.
+                booking.Price = booking.CalcTotalPrice(kennel.PricePerNight, kennel.PricePerWeek, booking.TotalNights);
+                booking.KennelID = id;
+                booking.User = currentUser;
+                db.Booking.Add(booking);
 
-            await db.SaveChangesAsync();
+                await db.SaveChangesAsync();
 
-            //Body of the email
-            string bookingConf = "<p> Kennel Name: " + kennel.Name + "</p><p>For pet: " + booking.PetsName + "</p><p> Date from: " + booking.StartDate.ToString().Substring(0, 10) +
-                "</p><p> Date to: " + booking.EndDate.Date.ToString().Substring(0, 10) + "</p><p> Total price: " + booking.Price;
-            string Message = "<p>Hi " + currentUser.Fname + " " + currentUser.Lname + "</p>" +
-                "<p>Thank you for booking with IS Kennels. </p> <p>Your booking is as follows: </p>" + bookingConf;
-            string Subject = "Booking Conformation for " + kennel.Name;
+                //Body of the email
+                string bookingConf = "<p> Kennel Name: " + kennel.Name + "</p><p>For pet: " + booking.PetsName + "</p><p> Date from: " + booking.StartDate.ToString().Substring(0, 10) +
+                    "</p><p> Date to: " + booking.EndDate.Date.ToString().Substring(0, 10) + "</p><p> Total price: " + booking.Price;
+                string Message = "<p>Hi " + currentUser.Fname + " " + currentUser.Lname + "</p>" +
+                    "<p>Thank you for booking with IS Kennels. </p> <p>Your booking is as follows: </p>" + bookingConf;
+                string Subject = "Booking Conformation for " + kennel.Name;
+                string Email = currentUser.Email;
 
-            //Calls the email funtion
-            SendConfirmation(Message, Subject);
+                //Calls the email funtion
+                SendConfirmation(Message, Subject, Email);
 
-            TempData["Thank"] = "Thank you for your booking";
-            return RedirectToAction("Index");
+                TempData["Thank"] = "Booking confirmed. Thank you for your booking";
+                return RedirectToAction("Index");
             }
             else
             {
                 TempData["Oops"] = "Oops something has gone wrong please try again";
                 return RedirectToAction("CreateViewModel", new { id = id });
             }
-        } 
-       
+        }
+
 
         // GET: Bookings/Delete/{BookingID}
         public async Task<ActionResult> Delete(int? id)
@@ -424,7 +423,7 @@ namespace Kennels.Controllers
             if (currentUser.UserType == UserType.KennelOwner)
             {
                 var kk = db.Kennel.Where(k => k.KennelID == booking.KennelID).FirstOrDefault();
-                if(kk.User == currentUser)
+                if (kk.User == currentUser)
                 { kenOwn = true; }
             }
             //Only if logged in as the user who owns the booking or owner of kennel can you delete it, otherwise you get an unauthorized error. 
@@ -455,7 +454,7 @@ namespace Kennels.Controllers
                 ka.Availability -= 1;
                 db.Entry(ka).State = EntityState.Modified;
                 await db.SaveChangesAsync();
-               
+
                 //If the kennel on the date is full before the booking is cancelled then it is updated to not be full once the booking is cancelled
                 if (ka.Full == true)
                 {
@@ -464,16 +463,16 @@ namespace Kennels.Controllers
                     await db.SaveChangesAsync();
                 }
             }
-                        
-            
+
+
             string bookingConf = "<p> Kennel Name: " + kennel.Name + "</p><p>For pet: " + booking.PetsName + "</p><p> Date from: " + booking.StartDate.ToString().Substring(0, 10) +
                         "</p><p> Date to: " + booking.EndDate.Date.ToString().Substring(0, 10) + "</p><p> Total price: " + booking.Price;
             string Message = "<p>Hi " + currentUser.Fname + " " + currentUser.Lname + "</p>" +
                         "<p>Confirmation of the cancellation of the following booking: </p>" + bookingConf;
             string Subject = "Booking Cancellation for " + kennel.Name;
-
+            string Email = currentUser.Email;
             //Calls the function to send the email
-            SendConfirmation(Message, Subject);
+            SendConfirmation(Message, Subject, Email);
 
             db.Booking.Remove(booking);
             await db.SaveChangesAsync();

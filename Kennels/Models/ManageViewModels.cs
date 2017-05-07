@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
-using Kennels.Models;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Kennels.Models
 {
@@ -25,12 +24,12 @@ namespace Kennels.Models
     {
         public string Purpose { get; set; }
     }
-    
+
     public class EditUserViewModel
     {
         public EditUserViewModel() { }
 
-        // Allow Initialization with an instance of ApplicationUser:
+        //Initialization with an instance of ApplicationUser
         public EditUserViewModel(ApplicationUser user)
         {
             this.Email = user.Email;
@@ -91,7 +90,7 @@ namespace Kennels.Models
         [Display(Name = "Confirm new password")]
         [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-    }    
+    }
 
 
     public class AddPhoneNumberViewModel

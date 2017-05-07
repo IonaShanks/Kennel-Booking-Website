@@ -1,19 +1,15 @@
-﻿using System.Data;
-using System.Linq;
-using System.Web.Mvc;
-using Kennels.Models;
+﻿using Kennels.Models;
 using System;
-using System.Collections.Generic;
-using System.Net.Mail;
 using System.Net;
-using System.Threading.Tasks;
+using System.Net.Mail;
+using System.Web.Mvc;
 
 namespace Kennels.Controllers
 {
     public class HomeController : Controller
     {
-        private KennelsContext db = new KennelsContext(); 
-       
+        private KennelsContext db = new KennelsContext();
+
         public ActionResult About()
         {
             ViewBag.Message = "Helping you find the ideal kennel.";
@@ -66,11 +62,11 @@ namespace Kennels.Controllers
                     String Email = vm.EmailFrom;
                     String Name = vm.Name;
                     //Calls the function to send the email 
-                    ContactEmail(Message, Email, Name);                 
+                    ContactEmail(Message, Email, Name);
                 }
                 catch (Exception ex)
                 {
-                    ModelState.Clear();                    
+                    ModelState.Clear();
                     TempData["Error"] = $" Sorry we are facing Problem here {ex.Message}";
                 }
             }
@@ -79,7 +75,8 @@ namespace Kennels.Controllers
                 ModelState.AddModelError("", "ModelState not valid");
                 return View(vm);
             }
-            return View(vm);
+            ViewBag.Success = "Thank you for getting in contact, your message has been sent!";
+            return View();
         }
     }
 }

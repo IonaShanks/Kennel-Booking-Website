@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Kennels.Models
 {
@@ -11,8 +7,8 @@ namespace Kennels.Models
     {
         [Required, StringLength(30, MinimumLength = 4, ErrorMessage = "Must be between 4 and 30 characters.")]
         public string Name { get; set; }
-        [Required, EmailAddress, Display(Name="Email")]
-        public string EmailFrom { get; set; }        
+        [Required, EmailAddress, Display(Name = "Email")]
+        public string EmailFrom { get; set; }
         [Required]
         public string Message { get; set; }
     }

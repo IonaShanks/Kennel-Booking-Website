@@ -32,9 +32,9 @@ namespace Kennels.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -79,18 +79,21 @@ namespace Kennels.Controllers
             return View(model);
         }
 
+
+        //Get: /Manage/Edit
         public ActionResult Edit()
         {
             var Db = new KennelsContext();
-
             var userId = User.Identity.GetUserId();
             var user = Db.Users.SingleOrDefault(u => u.Id == userId);
+            //gets the model of the current user and displays for editing
             var model = new EditUserViewModel(user);
             return View(model);
 
         }
-        [HttpPost]
 
+        // POST: /Manage/Edit
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(EditUserViewModel model)
         {
@@ -99,7 +102,7 @@ namespace Kennels.Controllers
                 var Db = new KennelsContext();
                 var userId = User.Identity.GetUserId();
                 var user = Db.Users.SingleOrDefault(u => u.Id == userId);
-                // Update the user data:                
+                //Updates the data changed by the user.                
                 user.Fname = model.Fname;
                 user.Lname = model.Lname;
                 user.Address = model.Address;
@@ -110,7 +113,7 @@ namespace Kennels.Controllers
                 await Db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            // If we got this far, something failed, redisplay form
+            // Redisplays form if some input not valid.
             return View(model);
         }
 
@@ -138,7 +141,7 @@ namespace Kennels.Controllers
             return RedirectToAction("ManageLogins", new { Message = message });
         }
 
-        
+
 
         //
         // GET: /Manage/AddPhoneNumber
@@ -254,9 +257,10 @@ namespace Kennels.Controllers
             return RedirectToAction("Index", new { Message = ManageMessageId.RemovePhoneSuccess });
         }
 
-        
-                
+
+
         // GET: /Manage/ChangePassword
+        [Authorize]
         public ActionResult ChangePassword()
         {
             return View();
@@ -375,7 +379,7 @@ namespace Kennels.Controllers
             base.Dispose(disposing);
         }
 
-#region Helpers
+        #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
@@ -426,6 +430,6 @@ namespace Kennels.Controllers
             Error
         }
 
-#endregion
+        #endregion
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Kennels.Models
-{    
+{
     public enum County
     {
         Carlow, Cavan, Clare, Cork, Donegal, Dublin, Galway, Kerry, Kildare, Kilkenny, Laois, Leitrim, Limerick, Longford, Louth, Mayo, Meath, Monaghan, Offaly, Roscommon, Sligo, Tipperary, Waterford, Westmeath, Wexford, Wicklow
@@ -20,21 +20,21 @@ namespace Kennels.Models
         [Required]
         public String Address { get; set; }
 
-        [Required, Display(Name ="Town/City")]
-        public String Town {get; set;}
+        [Required, Display(Name = "Town/City")]
+        public String Town { get; set; }
 
         [Required]
-        public County County { get; set; }   
-        
+        public County County { get; set; }
+
         [Required, Phone, Display(Name = "Phone Number")]
         public String PhoneNumber { get; set; }
 
-        [Required, EmailAddress, Display(Name= "Email")]
+        [Required, EmailAddress, Display(Name = "Email")]
         public String Email { get; set; }
 
         [Required, Range(1, Int32.MaxValue, ErrorMessage = "{0} must be greater than 0.")]
         public int Capacity { get; set; }
-        
+
         [DisplayFormat(DataFormatString = "{0:C}"), Required, Display(Name = "Price per Night"), Range(0.01, Int32.MaxValue, ErrorMessage = "{0} must be greater than 0.")]
         public double PricePerNight { get; set; }
 
@@ -56,7 +56,7 @@ namespace Kennels.Models
         [Required, Display(Name = "Cancellation Period (Hours)"), Range(1, Int32.MaxValue, ErrorMessage = "{0} must be greater than 0.")]
         public double CancellationPeriod { get; set; }
 
-        [Display(Name ="Kennel Description")]
+        [Display(Name = "Kennel Description")]
         public String Description { get; set; }
 
         [Required]

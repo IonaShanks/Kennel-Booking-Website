@@ -16,7 +16,7 @@ namespace Kennels.Controllers
     public class RatingsController : Controller
     {
         public static bool Customer = false;
-        public static string kenID; 
+        public static string kenID;
 
         private KennelsContext db = new KennelsContext();
         private UserManager<ApplicationUser> manager;
@@ -61,7 +61,7 @@ namespace Kennels.Controllers
             IQueryable<Rating> ratings = db.Rating.Include(k => k.Kennel).Where(b => b.User.Id == currentUser.Id);
 
             if (Customer == true)
-            {                
+            {
                 //If the Current user has ratings it shows them a list of their ratings
                 if (ratings.Count() > 0)
                 {
@@ -86,7 +86,7 @@ namespace Kennels.Controllers
         [AllowAnonymous]
         public ActionResult KennelRatings(string id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
@@ -96,10 +96,10 @@ namespace Kennels.Controllers
 
             isCustomer();
 
-            kenID = id; 
+            kenID = id;
             //If the selected kennel has ratings it shows them a list of the ratings 
             if (ratings.Count() > 0)
-            {                
+            {
                 return View(ratings);
             }
             else
@@ -107,7 +107,7 @@ namespace Kennels.Controllers
                 //if no ratings it shows an empty list with a message
                 ViewBag.NoRate = "No ratings to show.";
                 return View(ratings);
-            }            
+            }
         }
 
         // GET: Ratings/Details/{RatingID}
@@ -123,9 +123,9 @@ namespace Kennels.Controllers
             if (rating == null)
             {
                 return HttpNotFound();
-            }            
+            }
             return View(rating);
-            
+
         }
 
         // GET: Ratings/Create
@@ -133,26 +133,26 @@ namespace Kennels.Controllers
         {
             isCustomer();
             var currentUser = getUser();
-            
+
             bool ratingExists = db.Rating.Where(r => r.KennelID == id && r.User.Id == currentUser.Id).Count() > 0;
-            
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             //If user has already rated the kennel 
-            if(ratingExists == true)
+            if (ratingExists == true)
             {
                 //Redirects to the already created rating to edit, with a message        
-                TempData["alreadyRated"] = "You have already rated this kennel you may edit your rating.";                
+                TempData["alreadyRated"] = "You have already rated this kennel you may edit your rating.";
                 var rateID = db.Rating.Where(r => r.KennelID == id && r.User.Id == currentUser.Id).First();
                 return RedirectToAction("Edit", new { id = rateID.RatingID });
             }
 
             //Only user type customer may make ratings
             if (Customer == true)
-            {       
+            {
                 var kID = db.Kennel.Where(k => k.KennelID == id).First();
                 ViewBag.KennelName = kID.Name;
                 return View();
@@ -161,7 +161,7 @@ namespace Kennels.Controllers
             {
                 TempData["Unauth"] = "You are not authorised to do that, you must be logged in as a customer";
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
-            }            
+            }
         }
 
         // POST: Ratings/Create
@@ -247,10 +247,10 @@ namespace Kennels.Controllers
         // POST: Ratings/Edit/{RatingID}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
+
         public async Task<ActionResult> Edit([Bind(Include = "RatingID,Ratings,KennelID,Comment,RatingDate")] Rating rating)
         {
-            
+
             if (ModelState.IsValid)
             {
                 //rating above only takes RatingID and the changed Rating so it's queried to find the rest.
@@ -261,7 +261,7 @@ namespace Kennels.Controllers
                 tra.TotalRatings = (tra.TotalRatings - ra.Ratings) + rating.Ratings;
                 tra.AverageRating = tra.calcAvgRating(tra.TotalRatings, tra.TotalRaters);
                 db.Entry(tra).State = EntityState.Modified;
-                
+
 
                 //Adds the new rating to the queried variable and updates the database with it.
                 ra.Ratings = rating.Ratings;
@@ -269,11 +269,11 @@ namespace Kennels.Controllers
                 ra.RatingDate = DateTime.Now;
                 db.Entry(ra).State = EntityState.Modified;
                 await db.SaveChangesAsync();
-                
+
                 TempData["Thank"] = "Rating Updated";
                 return RedirectToAction("Index");
             }
-            
+
             return View(rating);
         }
 
@@ -320,10 +320,10 @@ namespace Kennels.Controllers
             {
                 db.TotalRating.Remove(tra);
             }
-            
+
             db.Rating.Remove(rating);
             await db.SaveChangesAsync();
-            TempData["Thank"] = "Rating Removed"; 
+            TempData["Thank"] = "Rating Removed";
             return RedirectToAction("Index");
         }
 
