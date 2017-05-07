@@ -94,13 +94,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\UnitTest1.cs" />
-    <Compile Include="Controllers\RatingContollerTest.cs" />
     <Compile Include="Controllers\AccountControllerTest.cs" />
-    <Compile Include="Controllers\BookingControllerTest.cs" />
     <Compile Include="Controllers\ManageControllerTest.cs" />
     <Compile Include="Controllers\KennelControllerTest.cs" />
-    <Compile Include="Models\UnitTest1.cs" />
     <Compile Include="Models\BookingTest.cs" />
     <Compile Include="Models\TotalRatingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

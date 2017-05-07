@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kennels;
 using Kennels.Controllers;
+using Kennels.Models;
 
 namespace Kennels.Tests.Controllers
 {
@@ -37,6 +38,22 @@ namespace Kennels.Tests.Controllers
 
             // Assert
             Assert.IsNotNull(result);
-        }        
+        }
+
+        [TestMethod()]
+        public void ContactEmailTest()
+        {
+            var controller = new HomeController();
+
+            var vm = new ContactViewModel()
+            {
+                Message = "Message",
+                EmailFrom = "email",
+                Name = "Name"
+            };                 
+
+            var result = controller.Contact(vm) as ViewResult;
+            Assert.AreEqual("Thank you for getting in contact, your message has been sent!", result.ViewBag.Success);
+        }
     }
 }

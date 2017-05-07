@@ -9,7 +9,7 @@ namespace Kennels.Tests.Controllers
     public class AccountControllerTest
     {
         [TestMethod]
-        public void TestLogIn()
+        public void TestLogInReturnURL()
         {
             var controller = new AccountController();
             var result = controller.Login("google.com") as ViewResult;
@@ -31,17 +31,5 @@ namespace Kennels.Tests.Controllers
             Assert.IsNotNull(result);            
         }
 
-
-        //[TestMethod]
-        //public void TestLogOff()
-        //{
-        //    var controller = new AccountController();
-        //    var result = (RedirectToRouteResult)controller.LogOff();
-
-        //    result.RouteValues["action"].Equals("Index");
-        //    result.RouteValues["controller"].Equals("Kennels");
-
-        //    Assert.AreEqual("Kennels", result.RouteValues["controller"]);
-        //}
     }
 }
