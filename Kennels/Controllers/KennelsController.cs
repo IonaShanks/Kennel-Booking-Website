@@ -258,7 +258,7 @@ namespace Kennels.Controllers
 
         // GET: Kennels
         [AllowAnonymous]
-        public ActionResult Index(string county, string searchName, String searchStart, String searchEnd, string searchRate, string sort)
+        public ActionResult Index(string county, string searchName, string searchStart, string searchEnd, string searchRate, string sort)
         {
             //To only show specific things to specific users in the view
             dateSearch = false;
@@ -272,7 +272,7 @@ namespace Kennels.Controllers
             IQueryable<Kennel> kennels = db.Kennel.Include(k => k.TotalRating);
 
             //Search by date
-            if (searchStart != null && searchEnd != null)
+            if (!string.IsNullOrEmpty(searchStart) && !string.IsNullOrEmpty(searchEnd))
             {
                 kennels = SearchByDate(searchStart, searchEnd, searchRate);
             }
