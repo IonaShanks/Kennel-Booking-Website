@@ -52,8 +52,7 @@
             <div class="form-group, col-md-4">
                 <br />                
                 <label class="control-label" for="inputDefault">End Date: </label>
-                <br /> 
-                
+                <br />                
                 @Html.TextBox("searchEnd", "", new { id = "to", @class = "form-control", placeholder = "dd/mm/yyyy" })
             </div>
 
@@ -194,67 +193,19 @@
 </div>
 
 
-@*@Scripts.Render("~/bundles/jqueryui")*@
-<script>
 
-  //  $( function() {
-  //  var dateFormat = "mm/dd/yy",
-  //    from = $( "#from" )
-  //      .datepicker({
-  //        defaultDate: "+1w",
-  //        changeMonth: true,
-  //        numberOfMonths: 3
-  //      })
-  //      .on( "change", function() {
-  //        to.datepicker( "option", "minDate", getDate( this ) );
-  //      }),
-  //    to = $( "#to" ).datepicker({
-  //      defaultDate: "+1w",
-  //      changeMonth: true,
-  //      numberOfMonths: 3
-  //    })
-  //    .on( "change", function() {
-  //      from.datepicker( "option", "maxDate", getDate( this ) );
-  //    });
- 
-  //  function getDate( element ) {
-  //    var date;
-  //    try {
-  //      date = $.datepicker.parseDate( dateFormat, element.value );
-  //    } catch( error ) {
-  //      date = null;
-  //    }
- 
-  //    return date;
-  //  }
-  //} );
-
-
-    //$(function pageLoad() {
+<script>   
+        
         $("#to").datepicker({
-            dateFormat: "dd/mm/yy"
+            dateFormat: "dd/mm/yy",
+            minDate: new Date()
         });
 
         $("#from").datepicker({
-            dateFormat: "dd/mm/yy"
+            dateFormat: "dd/mm/yy",
+            minDate: new Date(),
         });
-
-    //});
-
-
-
-    //$(document).ready(function () {
-    //    //Initializing the datepicker
-    //    $("[id$=_to]").datepicker({ dateFormat: "dd/mm/yy"});
-    //    //Code to set the datepicker's date again after post back
-    //    if (!($("[id$=_to]").attr("Value") == undefined)) {
-    //        if ($("[id$=_to]").attr("Value").length > 0) {
-    //            $("[id$=_to]").datepicker("setDate", new Date($("[id$=_to]").val($("[id$=_to]").attr("Value"))));
-    //        }
-    //    }
-    //}
-
-
+    
 </script>
 
 
