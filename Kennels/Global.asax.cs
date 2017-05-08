@@ -15,8 +15,7 @@ namespace Kennels
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
-            ModelBinders.Binders.Add(typeof(DateTime?), new Models.DateFormat());
+            BundleConfig.RegisterBundles(BundleTable.Bundles);            
         }
     }
 }

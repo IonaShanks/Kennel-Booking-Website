@@ -219,7 +219,6 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Booking.cs" />
     <Compile Include="Models\ContactViewModel.cs" />
-    <Compile Include="Models\DateFormat.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Kennel.cs" />
     <Compile Include="Models\KennelAvailability.cs" />
