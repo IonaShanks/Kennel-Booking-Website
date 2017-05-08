@@ -25,7 +25,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextBoxFor(model => model.StartDate, "{0:dd/MM/yyyy}", htmlAttributes: new { id = "from", @class = "form-control" } )
+                @Html.TextBoxFor(model => model.StartDate, "{0:dd/MM/yyyy}", htmlAttributes: new { id = "from", @class = "form-control", placeholder = "dd/mm/yyyy" } )
                 @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -33,7 +33,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextBoxFor(model => model.EndDate, "{0:dd/MM/yyyy}", htmlAttributes: new { id = "to", @class = "form-control" })
+                @Html.TextBoxFor(model => model.EndDate, "{0:dd/MM/yyyy}", htmlAttributes: new { id = "to", @class = "form-control", placeholder = "dd/mm/yyyy" })
                 @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -51,14 +51,16 @@
     @Html.ActionLink("Back to Bookings", "Index")
 </div>
 
-@*@Scripts.Render("~/bundles/jqueryui")*@
+
 <script>
 
     $("#to").datepicker({
-        dateFormat: "dd/mm/yy"
+        dateFormat: "dd/mm/yy",
+        minDate: new Date()
     });
     $("#from").datepicker({
-        dateFormat: "dd/mm/yy"
+        dateFormat: "dd/mm/yy",
+        minDate: new Date()
     });
    
 </script>
@@ -67,6 +69,5 @@
 
 @section Scripts {
 @Scripts.Render("~/bundles/jqueryval")
-@*@Scripts.Render("~/bundles/jqueryui")*@
 }
 
