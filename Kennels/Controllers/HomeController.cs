@@ -71,8 +71,7 @@ namespace Kennels.Controllers
 
             if (string.IsNullOrEmpty(emailTo))
             {
-                ViewBag.SelectKennel = "Please Select a Kennel to Contact";
-                ViewBag.emailTo = new SelectList(GetEmailList());
+                ViewBag.SelectKennel = "Please Select a Kennel to Contact";                
                 return View(vm);
             }
             else
@@ -109,7 +108,7 @@ namespace Kennels.Controllers
                     ModelState.AddModelError("", "ModelState not valid");
                     return View(vm);
                 }
-                ViewBag.emailTo = new SelectList(GetEmailList());
+                
                 ViewBag.Success = "Thank you for getting in contact, your message has been sent!";
                 return View();
             }
