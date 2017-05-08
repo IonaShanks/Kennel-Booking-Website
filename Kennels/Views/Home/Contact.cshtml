@@ -14,6 +14,18 @@
             if (TempData["Error"] == null)
             {
                 <div>
+                    <label class="control-label">To:</label>
+                    <br />
+                    <label class="control-label" for="inputDefault">Kennel </label>
+                    <br />
+                    @Html.DropDownList("emailTo", (SelectList)ViewBag.emailTo, "Select a Kennel", new { @class = "form-control" })
+                    <p style="color: red;">@ViewBag.SelectKennel</p>
+                </div>
+                <br />
+                
+                <label class="control-label">From:</label>
+                <br />
+                <div>
                     @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
                     <br />
 

@@ -1,5 +1,7 @@
 ﻿using Kennels.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Web.Mvc;
@@ -18,14 +20,14 @@ namespace Kennels.Controllers
         }
 
         //Function to send email 
-        public void ContactEmail(string Message, string Email, String Name)
+        public void ContactEmail(string Message, string EmailFrom, String Name, string EmailTo)
         {
             //Making email            
             var message = new MailMessage();
-            message.To.Add(new MailAddress("IonaKennel@gmail.com"));
-            message.From = new MailAddress(Email);
+            message.To.Add(new MailAddress(EmailTo));
+            message.From = new MailAddress(EmailFrom);
             message.Subject = "Contact Form";
-            message.Body = string.Format("<p>From: " + Name + "</p><p>Email: " + Email + "</p><p>Message: " + Message + "</p>");
+            message.Body = string.Format("<p>From: " + Name + "</p><p>Email: " + EmailFrom + "</p><p>Message: " + Message + "</p>");
             message.IsBodyHtml = true;
 
             //Sending email
@@ -41,42 +43,76 @@ namespace Kennels.Controllers
                 smtp.Send(message);
             }
         }
-        [HttpGet]
-        public ActionResult Contact()
+
+
+        public List<string> GetEmailList()
         {
+            var emailList = new List<string>();
+            var emailQry = db.Kennel.Select(c => c.Name.ToString());
+            emailList.AddRange(emailQry.Distinct());
+            emailList.Add("IS Kennel Finder");
+            return emailList;
+        }
+
+        [HttpGet]
+        public ActionResult Contact(string emailTo)
+        {
+            ViewBag.emailTo = new SelectList(GetEmailList());
             ViewBag.Message = "Contact IS Kennel Finder";
 
             return View();
-        }
+        }       
 
         [HttpPost]
-        public ActionResult Contact(ContactViewModel vm)
+        public ActionResult Contact(ContactViewModel vm, string emailTo)
         {
             ViewBag.Message = "Contact IS Kennel Finder";
-            if (ModelState.IsValid)
+            ViewBag.emailTo = new SelectList(GetEmailList());
+
+            if (string.IsNullOrEmpty(emailTo))
             {
-                try
-                {
-                    //Fills the function paramaters based on what the use inputs in the form
-                    String Message = vm.Message;
-                    String Email = vm.EmailFrom;
-                    String Name = vm.Name;
-                    //Calls the function to send the email 
-                    ContactEmail(Message, Email, Name);
-                }
-                catch (Exception ex)
-                {
-                    ModelState.Clear();
-                    TempData["Error"] = $" Sorry we are facing Problem here {ex.Message}";
-                }
+                ViewBag.SelectKennel = "Please Select a Kennel to Contact";
+                ViewBag.emailTo = new SelectList(GetEmailList());
+                return View(vm);
             }
             else
             {
-                ModelState.AddModelError("", "ModelState not valid");
-                return View(vm);
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        //Fills the function paramaters based on what the use inputs in the form
+                        String Message = vm.Message;
+                        String EmailFrom = vm.EmailFrom;
+                        String Name = vm.Name;
+                        String EmailTo;
+                        if (vm.EmailTo == "IS Kennel Finder")
+                        {
+                            EmailTo = "ionakennel@gmail.com";
+                        }
+                        else
+                        {
+                            var email = db.Kennel.Where(k => k.Name == vm.EmailTo).FirstOrDefault();
+                            EmailTo = email.Email;
+                        }
+                        //Calls the function to send the email 
+                        ContactEmail(Message, EmailFrom, Name, EmailTo);
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.Clear();
+                        TempData["Error"] = $" Sorry we are facing Problem here {ex.Message}";
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "ModelState not valid");
+                    return View(vm);
+                }
+                ViewBag.emailTo = new SelectList(GetEmailList());
+                ViewBag.Success = "Thank you for getting in contact, your message has been sent!";
+                return View();
             }
-            ViewBag.Success = "Thank you for getting in contact, your message has been sent!";
-            return View();
         }
     }
 }
