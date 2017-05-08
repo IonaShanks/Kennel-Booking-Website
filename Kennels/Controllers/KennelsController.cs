@@ -35,7 +35,7 @@ namespace Kennels.Controllers
             return q;
         }
 
-        public ApplicationUser getUser()
+        public ApplicationUser GetUser()
         {
             var currentUser = manager.FindById(User.Identity.GetUserId());
             return currentUser;
@@ -46,9 +46,19 @@ namespace Kennels.Controllers
         public static DateTime searchEn;
         public static bool dateSearch = false;
 
+        private string rateResult = "";
+        private string countyResult = "";
+        private string nameResult = "";
+        private string dateResult = "";
+        private string sortResult = "";        
 
+        public string SetSearchResult()
+        {
+            string result = $"You have searched for: {countyResult}{nameResult}{rateResult}{dateResult}{sortResult}";
+            return result;
+        }
 
-        public List<Kennel> searchByRating(string searchRate)
+        public List<Kennel> SearchByRating(string searchRate)
         {
             var rateList = new List<Kennel>();
             //Loops through every kennel in the kennel database
@@ -71,17 +81,18 @@ namespace Kennels.Controllers
                     }
                 }
             }
+            rateResult = "Rating: " + searchRate + " stars and above. ";
             return rateList;
         }
 
-        public IQueryable<Kennel> searchByDate(DateTime? searchStart, DateTime? searchEnd, string searchRate)
+        public IQueryable<Kennel> SearchByDate(String searchStart, String searchEnd, string searchRate)
         {
             IQueryable<Kennel> kennels = db.Kennel.Include(k => k.TotalRating);
             var rateSearchList = new List<Kennel>();
             //So that rating doesn't override date it is included
             if (!string.IsNullOrEmpty(searchRate))
             {
-                rateSearchList = searchByRating(searchRate);
+                rateSearchList = SearchByRating(searchRate);
             }
             else
             {
@@ -92,17 +103,13 @@ namespace Kennels.Controllers
                 }
             }
 
+            //Converts the variables from string to DateTime 
+            DateTime ss = Convert.ToDateTime(searchStart);
+            DateTime se = Convert.ToDateTime(searchEnd);
             //Checks the start date is before the end date
-            if (searchEnd > searchStart)
+            if (se > ss)
             {
-
-                dateSearch = true;
-                //DateTime dt = DateTime.ParseExact(searchStart.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture);
-
-                //Converts the variables from DateTime? to DateTime 
-                DateTime ss = Convert.ToDateTime(searchStart);
-                DateTime se = Convert.ToDateTime(searchEnd);
-
+                dateSearch = true;                          
                 searchSt = ss;
                 searchEn = se;
 
@@ -160,10 +167,11 @@ namespace Kennels.Controllers
                 kennels = rateSearchList.AsQueryable();
                 ViewBag.Invalid = "Invalid dates, start date must be before end date!";
             }
+            dateResult = "Check-in date: " + searchStart + " Check-out date: " + searchEnd + ". ";
             return kennels;
         }
 
-        public IQueryable<Kennel> sortBy(string sort)
+        public IQueryable<Kennel> SortBy(string sort)
         {
             IQueryable<Kennel> kennels = db.Kennel.Include(k => k.TotalRating);
             //Orders the kennel list based on the sort selected from the list.         
@@ -191,12 +199,13 @@ namespace Kennels.Controllers
             {
                 kennels = kennels.OrderBy(k => k.PricePerWeek);
             }
+            sortResult = "Sorted by: " + sort + ". ";
             return kennels;
         }
 
-        public void isKennelOwner()
+        public void IsKennelOwner()
         {
-            var currentUser = getUser();
+            var currentUser = GetUser();
             if (currentUser != null)
             {
                 if (currentUser.UserType == UserType.KennelOwner)
@@ -214,7 +223,7 @@ namespace Kennels.Controllers
             }
         }
 
-        public List<int> getRatingList()
+        public List<int> GetRatingList()
         {
             //Creates a list of ratings 1 - 5
             var RatingList = new List<int>();
@@ -225,7 +234,7 @@ namespace Kennels.Controllers
             return RatingList;
         }
 
-        public List<string> getCountyList()
+        public List<string> GetCountyList()
         {
             //Creates a list of distinct countys that have kennels in them.
             var CountyList = new List<string>();
@@ -234,7 +243,7 @@ namespace Kennels.Controllers
             return CountyList;
         }
 
-        public List<string> getSortList()
+        public List<string> GetSortList()
         {
             //Select list to sort the table
             var SortList = new List<string>();
@@ -249,43 +258,44 @@ namespace Kennels.Controllers
 
         // GET: Kennels
         [AllowAnonymous]
-        public ActionResult Index(string county, string searchName, DateTime? searchStart, DateTime? searchEnd, string searchRate, string sort)
+        public ActionResult Index(string county, string searchName, String searchStart, String searchEnd, string searchRate, string sort)
         {
             //To only show specific things to specific users in the view
             dateSearch = false;
-            isKennelOwner();
+            IsKennelOwner();
 
             //Creating Select lists for each             
-            ViewBag.county = new SelectList(getCountyList());
-            ViewBag.rate = new SelectList(getRatingList());
-            ViewBag.sort = new SelectList(getSortList());
+            ViewBag.county = new SelectList(GetCountyList());
+            ViewBag.rate = new SelectList(GetRatingList());
+            ViewBag.sort = new SelectList(GetSortList());
 
             IQueryable<Kennel> kennels = db.Kennel.Include(k => k.TotalRating);
 
             //Search by date
-            if (searchStart.HasValue && searchEnd.HasValue)
+            if (searchStart != null && searchEnd != null)
             {
-                kennels = searchByDate(searchStart, searchEnd, searchRate);
+                kennels = SearchByDate(searchStart, searchEnd, searchRate);
             }
 
             //Search by rating if search dates are not entered (overrides if entered)
-            if (!string.IsNullOrEmpty(searchRate) && !searchStart.HasValue && !searchEnd.HasValue)
+            if (!string.IsNullOrEmpty(searchRate) && searchStart == null && searchEnd == null)
             {
                 var rateList = new List<Kennel>();
-                rateList = searchByRating(searchRate);
+                rateList = SearchByRating(searchRate);
                 kennels = rateList.AsQueryable();
             }
 
             //Sort results
             if (!string.IsNullOrEmpty(sort))
             {
-                kennels = sortBy(sort);
+                kennels = SortBy(sort);
             }
 
             //Search by name
             if (!string.IsNullOrEmpty(searchName))
             {
                 //Adds the kennels to the list that include the name searched
+                nameResult = "Kennel name includes: " + searchName + ". ";
                 kennels = kennels.Where(n => n.Name.Contains(searchName));
             }
 
@@ -293,29 +303,28 @@ namespace Kennels.Controllers
             if (!string.IsNullOrEmpty(county))
             {
                 //Adds the kennels to the list that are in the selected county
+                countyResult = "County: " + county + ". ";
                 kennels = kennels.Where(c => c.County.ToString() == county);
             }
 
             rate = db.TotalRating;
+           
+            ViewBag.Result = SetSearchResult();
             //Displays the view from all the queries
             return View(kennels);
         }
 
-        public UserType getUserType()
-        {
-            var currentUser = manager.FindById(User.Identity.GetUserId());
-            return currentUser.UserType;
-        }
+      
 
 
 
         public ActionResult MyKennels()
         {
-            var currentUser = getUser();
+            var currentUser = GetUser();
             IQueryable<Kennel> kennels = db.Kennel.Where(b => b.User.Id == currentUser.Id);
 
             //If the user type is Kennel Owner
-            if (getUserType() == UserType.KennelOwner)
+            if (currentUser.UserType == UserType.KennelOwner)
             {
                 //If they have added a kennel
                 if (kennels.Count() > 0)
@@ -375,7 +384,7 @@ namespace Kennels.Controllers
             Booking sd = TempData["searchDates"] as Booking;
             TempData["searchDates"] = sd;
 
-            isKennelOwner();
+            IsKennelOwner();
 
             if (id == null)
             {
@@ -396,7 +405,7 @@ namespace Kennels.Controllers
         // GET: Kennels/Create
         public ActionResult Create()
         {
-            isKennelOwner();
+            IsKennelOwner();
             //Only type kennel owner is authorized to add kennels
             if (KennelOwner == false)
             {
@@ -412,7 +421,7 @@ namespace Kennels.Controllers
         public async Task<ActionResult> Create([Bind(Include = "KennelID,Name,Address,County,Town,PhoneNumber,Email,Capacity,PricePerNight,PricePerWeek,MaxDays,LgeDog,MedDog,SmlDog,CancellationPeriod,Description,Grooming,Training")] Kennel kennels)
         {
 
-            var currentUser = getUser();
+            var currentUser = GetUser();
 
             if (ModelState.IsValid)
             {
@@ -436,7 +445,7 @@ namespace Kennels.Controllers
         // GET: Kennels/Edit/{KennelID}
         public async Task<ActionResult> Edit(string id)
         {
-            var currentUser = getUser();
+            var currentUser = GetUser();
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -479,7 +488,7 @@ namespace Kennels.Controllers
         // GET: Kennels/Delete/{KennelID}
         public async Task<ActionResult> Delete(string id)
         {
-            var currentUser = getUser();
+            var currentUser = GetUser();
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);

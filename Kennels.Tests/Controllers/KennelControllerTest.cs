@@ -13,7 +13,7 @@ namespace Kennels.Tests.Controllers
         public void getRatingListReturnsList()
         {
             var controller = new KennelsController();                       
-            var result = controller.getRatingList();
+            var result = controller.GetRatingList();
             Assert.IsInstanceOfType(result, typeof(List<int>));
         }
 
@@ -26,7 +26,7 @@ namespace Kennels.Tests.Controllers
             var ratList = new List<int>()
             { 1, 2, 3, 4 ,5 } ;
 
-            var result = controller.getRatingList();
+            var result = controller.GetRatingList();
 
             CollectionAssert.AreEqual(ratList, result);
         }
@@ -35,7 +35,7 @@ namespace Kennels.Tests.Controllers
         public void getSortListReturnsList()
         {
             var controller = new KennelsController();
-            var result = controller.getSortList();
+            var result = controller.GetSortList();
             Assert.IsInstanceOfType(result, typeof(List<string>));
 
         }
@@ -55,7 +55,7 @@ namespace Kennels.Tests.Controllers
                 "Price per Week (L-H)"
             };
 
-            var result = controller.getSortList();
+            var result = controller.GetSortList();
             CollectionAssert.AreEqual(sortList, result);
         }
 
