@@ -25,35 +25,6 @@ namespace Kennels.Tests.Controllers
 
             // Assert
             Assert.AreEqual("Helping you find the ideal kennel.", result.ViewBag.Message);
-        }
-
-        [TestMethod]
-        public void Contact()
-        {
-            // Arrange
-            HomeController controller = new HomeController();
-
-            // Act
-            ViewResult result = controller.Contact() as ViewResult;
-
-            // Assert
-            Assert.IsNotNull(result);
-        }
-
-        [TestMethod()]
-        public void ContactEmailTest()
-        {
-            var controller = new HomeController();
-
-            var vm = new ContactViewModel()
-            {
-                Message = "Message",
-                EmailFrom = "email",
-                Name = "Name"
-            };                 
-
-            var result = controller.Contact(vm) as ViewResult;
-            Assert.AreEqual("Thank you for getting in contact, your message has been sent!", result.ViewBag.Success);
-        }
+        }            
     }
 }
